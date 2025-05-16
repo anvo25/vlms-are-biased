@@ -1,7 +1,5 @@
 # Vision Language Models are Biased
 
-![VLMBias teaser image showing examples of visual bias testing](teaser.png)
-
 ## Generated Datasets
 
 VLMBias can generate various types of visual test datasets:
