@@ -7,7 +7,7 @@
     <a href="https://taesiri.ai/">Mohammad Reza Taesiri</a><sup>3</sup>, 
     <a href="https://www.linkedin.com/in/dang-thi-tuong-vy-00a357278/">Vy Tuong Dang</a><sup>1</sup>, 
     <a href="https://anhnguyen.me/research/">Anh Totti Nguyen</a><sup>4†</sup>, 
-    <a href="http://resl.kaist.ac.kr/">Daeyoung Kim</a><sup>1†</sup>
+    <a href="https://www.resl.kaist.ac.kr/members/director">Daeyoung Kim</a><sup>1†</sup>
   </p>
   <p>
     <sup>*</sup>Equal contribution<br>
