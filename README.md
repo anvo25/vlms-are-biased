@@ -72,8 +72,8 @@ python main.py --optical_illusions --illusion_type Ebbinghaus
 
 ## 📊 Available Tasks
 
-- ✅ **Game Pieces**: Chess pieces, Xiangqi pieces (modified starting positions)
-- ✅ **Board Games**: Chess board, Go board, Xiangqi board, Sudoku board (dimension variations)  
+- ✅ **Chess Pieces**: Chess pieces, Xiangqi pieces (modified starting positions)
+- ✅ **Game Boards**: Chess board, Go board, Xiangqi board, Sudoku board (dimension variations)  
 - ✅ **Optical Illusions**: Ebbinghaus, Müller-Lyer, Ponzo, Vertical-Horizontal, Zöllner, Poggendorff
 - ✅ **Patterned Grids**: Dice patterns, Tally mark patterns (anomalous cells)
 - 📝 **Placeholders**: Animals, Logos, Flags (require manual generation with AI models)
