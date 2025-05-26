@@ -18,8 +18,7 @@
 [![Project Page](https://img.shields.io/badge/Project_Page-vlmsarebiased.github.io-blue.svg)](https://vlmsarebiased.github.io)
 [![arXiv](https://img.shields.io/badge/arXiv-your--arxiv--id-b31b1b.svg)](https://arxiv.org/abs/your-arxiv-id)
 [![Hugging Face](https://img.shields.io/badge/🤗%20Hugging%20Face-Dataset-yellow.svg)](https://huggingface.co/datasets/anvo25/vlms-are-biased)
-[![Code License](https://img.shields.io/badge/Code_License-MIT-green.svg)](./LICENSE_CODE.txt)
-[![Data License](https://img.shields.io/badge/Data_License-CC--BY--4.0-lightgrey.svg)](./LICENSE_DATA.txt)
+[![Code License](https://img.shields.io/badge/Code_License-MIT-green.svg)](LICENSE)
 
 </div>
 
