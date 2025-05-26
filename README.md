@@ -85,7 +85,7 @@ python main.py --optical_illusions --illusion_type Ebbinghaus
 ## 📂 Structure
 
 ```
-VLMBias/
+vlms-are-biased/
 ├── main.py                        # Generate "notitle" datasets
 ├── add_titles.py                  # Add "in_image_title" versions
 ├── generators/                    # Individual dataset generators
