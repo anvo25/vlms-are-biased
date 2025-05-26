@@ -2,12 +2,12 @@
 
 <div align="center">    
   <p style="font-size: 20px;">by 
-    <a href="https://anvo25.github.io/">An Vo<sup>*</sup></a><sup>1</sup>,
-    <a href="https://nkn002.github.io/">Khai-Nguyen Nguyen<sup>*</sup></a><sup>2</sup>,
+    <a href="https://anvo25.github.io/">An Vo</a><sup>1*</sup>,
+    <a href="https://nkn002.github.io/">Khai-Nguyen Nguyen</a><sup>2*</sup>,
     <a href="https://taesiri.ai/">Mohammad Reza Taesiri</a><sup>3</sup>, 
     <a href="https://www.linkedin.com/in/dang-thi-tuong-vy-00a357278/">Vy Tuong Dang</a><sup>1</sup>, 
-    <a href="https://anhnguyen.me/research/">Anh Totti Nguyen<sup>†</sup></a><sup>4</sup>, 
-    <a href="http://resl.kaist.ac.kr/">Daeyoung Kim<sup>†</sup></a><sup>1</sup>
+    <a href="https://anhnguyen.me/research/">Anh Totti Nguyen</a><sup>4†</sup>, 
+    <a href="http://resl.kaist.ac.kr/">Daeyoung Kim</a><sup>1†</sup>
   </p>
   <p>
     <sup>*</sup>Equal contribution<br>
