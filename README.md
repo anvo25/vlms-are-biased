@@ -67,18 +67,32 @@ Generate specific optical illusions:
 python main.py --optical_illusions --illusion_type Ebbinghaus
 ```
 
----
+## 📊 Tasks
 
-## 📊 Available Tasks
+1. To download the images in our benchmark for a specific task, go to our [huggingface dataset](https://huggingface.co/datasets/anvo25/vlms-are-biased) and select the task topic.
 
-- ✅ **Chess Pieces**: Chess pieces, Xiangqi pieces (modified starting positions)
-- ✅ **Game Boards**: Chess board, Go board, Xiangqi board, Sudoku board (dimension variations)  
-- ✅ **Optical Illusions**: Ebbinghaus, Müller-Lyer, Ponzo, Vertical-Horizontal, Zöllner, Poggendorff
-- ✅ **Patterned Grids**: Dice patterns, Tally mark patterns (anomalous cells)
-- 📝 **Placeholders**: Animals, Logos, Flags
+2. To run the code to generate the images for a specific task, go to the following embedded links:
+- **Chess Pieces**: [Chess pieces](generators/chess_pieces_generator.py), [Xiangqi pieces](generators/xiangqi_board_generator.py) (modified starting positions)
+- **Game Boards**: [Chess board](generators/chess_board_generator.py), [Go board](generators/go_board_generator.py), [Xiangqi board](generators/xiangqi_board_generator.py), [Sudoku board](generators/sudoku_board_generator.py) (dimension variations)  
+- **[Optical Illusions](generators/optical_illusion_generator.py)**: Ebbinghaus, Müller-Lyer, Ponzo, Vertical-Horizontal, Zöllner, Poggendorff  
+- **[Patterned Grids](generators/patterned_grid_generator.py)**: Dice patterns, Tally mark patterns (anomalous cells)  
+- **[Animals](generators/animals_generator.py)**: Mammals (4 legs → 5 legs) and birds (2 legs → 3 legs)  
+- **[Logos](generators/logos_generator.py#L10)**: Consisting of 2 logo types: shoes and cars.
+  - **Shoe Logos**:  
+    - Nike (1 swoosh → 2 swooshes)
+    - Adidas (3 stripes → 4 stripes)
+  - **Car Logos**:  
+    - Maserati (3 prongs → 5 prongs)
+    - Mercedes-Benz (3-pointed star → 4-pointed star)
+    - Audi (4 overlapping circles → 5 overlapping circles)
+- **[Flags](generators/flags_generator.py)**: Star-typed flags (+1 and −1 star) and stripes (+1 and −1 stripe)
 
-*All images generated at 384px, 768px, and 1152px resolutions.*
+*All images are generated at 384px, 768px, and 1152px resolutions.*
 
+
+
+
+   
 ---
 
 ## 📂 Structure
@@ -100,9 +114,13 @@ vlms-are-biased/
 ## 📖 Citation
 
 ```bibtex
-@article{VLMsAreBiased2025,
-  title={Vision Language Models are Biased},
-  author={An Vo, Khai-Nguyen Nguyen, Mohammad Reza Taesiri, Vy Tuong Dang, Anh Totti Nguyen, Daeyoung Kim},
-  year={2025}
+@misc{vlmsarebiased,
+      title={Vision Language Models are Biased}, 
+      author={An Vo and Khai-Nguyen Nguyen and Mohammad Reza Taesiri and Vy Tuong Dang and Anh Totti Nguyen and Daeyoung Kim},
+      year={2025},
+      eprint={2505.23941},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2505.23941}, 
 }
 ```
