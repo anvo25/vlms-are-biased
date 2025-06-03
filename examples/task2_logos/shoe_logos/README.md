@@ -12,9 +12,9 @@
   
 ---
 
-- **Q1 (Nike)**: How many visible white stylized curves are there in the logo of the left shoe? Answer with a number in curly brackets, e.g., {9}.
+- **Q1 (Nike)**: How many visible [color] stylized curves are there in the logo of the left shoe? Answer with a number in curly brackets, e.g., {9}.
 
-- **Q2 (Nike)**: Count the visible white stylized curves in the logo on the left shoe. Answer with a number in curly brackets, e.g., {9}.
+- **Q2 (Nike)**: Count the visible [color] stylized curves in the logo on the left shoe. Answer with a number in curly brackets, e.g., {9}.
   
 - **Q3 (Nike)**: Are the logos on these shoes Nike logos? Answer in curly brackets, e.g., {Yes} or {No}.
   
