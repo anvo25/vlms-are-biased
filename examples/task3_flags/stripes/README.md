@@ -1,4 +1,4 @@
-# Task 3: Counting stripes in modified flags
+# Task 3: Counting stripes in modified flags (stripes)
 
 ## Prompts
 

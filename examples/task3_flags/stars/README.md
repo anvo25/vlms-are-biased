@@ -1,4 +1,4 @@
-# Task 3: Counting stars in modified flags
+# Task 3: Counting stars in modified flags (stars)
 
 ## Prompts
 
