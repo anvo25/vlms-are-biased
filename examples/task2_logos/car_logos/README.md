@@ -1,5 +1,4 @@
-# Task 2: Counting stripes in Adidas shoes and curves in Nike shoes
-
+# Task 2: Counting circles in Audi, points in Mercedes, and prongs in Maserati logos
 
 ## Prompts
 
