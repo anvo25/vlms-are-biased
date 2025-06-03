@@ -44,8 +44,13 @@ pip install -r requirements.txt
 ```
 
 ---
+## 👋 Trying out our images on your model
+Use [these examples](./examples) where most tested models fail to answer.
 
-## 🚀 Quick Example
+## 💽 Download the entire benchmark dataset
+Go to our [huggingface dataset](https://huggingface.co/datasets/anvo25/vlms-are-biased) and select the task topic.
+
+## 🚀 Generating images with in-image text containing subject name
 
 Generate chess pieces dataset with modified starting positions:
 ```bash
@@ -69,9 +74,7 @@ python main.py --optical_illusions --illusion_type Ebbinghaus
 
 ## 📊 Tasks
 
-1. To download the images in our benchmark for a specific task, go to our [huggingface dataset](https://huggingface.co/datasets/anvo25/vlms-are-biased) and select the task topic.
-
-2. To run the code to generate the images for a specific task, go to the following embedded links:
+To run the code to generate the images for a specific task, go to the following embedded links:
 - **Chess Pieces**: [Chess pieces](generators/chess_pieces_generator.py), [Xiangqi pieces](generators/xiangqi_board_generator.py) (modified starting positions)
 - **Game Boards**: [Chess board](generators/chess_board_generator.py), [Go board](generators/go_board_generator.py), [Xiangqi board](generators/xiangqi_board_generator.py), [Sudoku board](generators/sudoku_board_generator.py) (dimension variations)  
 - **[Optical Illusions](generators/optical_illusion_generator.py)**: Ebbinghaus, Müller-Lyer, Ponzo, Vertical-Horizontal, Zöllner, Poggendorff  
