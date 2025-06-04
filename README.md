@@ -50,28 +50,6 @@ Use [these examples](./examples) where most tested models fail to answer.
 ## 💽 Download the entire benchmark dataset
 Go to our [huggingface dataset](https://huggingface.co/datasets/anvo25/vlms-are-biased) and select the task topic.
 
-## 🚀 Generating images with in-image text containing subject name
-
-Generate chess pieces dataset with modified starting positions:
-```bash
-# Step 1: Generate "notitle" images
-python main.py --chess_pieces
-
-# Step 2: Add titles to create "in_image_title" versions  
-python add_titles.py --topic chess_pieces
-```
-
-Generate all available datasets:
-```bash
-python main.py --all
-python add_titles.py --topic all
-```
-
-Generate specific optical illusions:
-```bash
-python main.py --optical_illusions --illusion_type Ebbinghaus
-```
-
 ## 📊 Tasks
 
 To run the code to generate the images for a specific task, go to the following embedded links:
@@ -92,6 +70,28 @@ To run the code to generate the images for a specific task, go to the following 
 
 *All images are generated at 384px, 768px, and 1152px resolutions.*
 
+### Quickstart
+Generate all available datasets:
+```bash
+python main.py --all
+python add_titles.py --topic all
+```
+
+If you only want to generate data of a specific task, you can run the corresponding file instead. Here are some examples:
+
+Generate specific optical illusions:
+```bash
+python main.py --optical_illusions --illusion_type Ebbinghaus
+```
+
+Generate chess pieces dataset with modified starting positions:
+```bash
+# Step 1: Generate "notitle" images
+python main.py --chess_pieces
+
+# Step 2: Add titles to create "in_image_title" versions  
+python add_titles.py --topic chess_pieces
+```
 
 
 
