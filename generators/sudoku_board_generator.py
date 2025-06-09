@@ -1,5 +1,3 @@
-# generators/sudoku_board_generator.py
-# -*- coding: utf-8 -*-
 """
 Sudoku Board Generator - Generates "notitle" images of Sudoku boards
 with variations, highlighting 3x3 block structure.

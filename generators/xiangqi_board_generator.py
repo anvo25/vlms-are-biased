@@ -1,5 +1,3 @@
-# generators/xiangqi_board_generator.py
-# -*- coding: utf-8 -*-
 """
 Xiangqi (Chinese Chess) Board Generator - Generates "notitle" images of Xiangqi boards
 with variations in rows/columns, and includes General/Advisor pieces.

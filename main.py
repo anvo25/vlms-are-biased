@@ -1,27 +1,16 @@
-# main.py
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-ViasTest Dataset Generator - Main Script for 'notitle' datasets.
-"""
-
 import os
 import argparse
 import time
 import sys
 import importlib
 
-# --- Add generators directory to sys.path to find Pyllusion ---
-# This assumes main.py is in the project root and generators/ is a subdirectory.
+
 project_root = os.path.dirname(os.path.abspath(__file__))
 generators_path = os.path.join(project_root, "generators")
 if generators_path not in sys.path:
     sys.path.insert(0, generators_path)
-# --- End of sys.path modification ---
-
 
 from utils import create_directory_structure, sanitize_filename
-# Import generator functions from the 'generators' package
 from generators import chess_pieces_generator
 from generators import xiangqi_pieces_generator
 from generators import chess_board_generator
@@ -31,14 +20,9 @@ from generators import sudoku_board_generator
 from generators import patterned_grid_generator
 from generators import optical_illusion_generator
 
-# Now try to import Pyllusion components after path adjustment
-# The actual import of pyllusion will happen inside optical_illusion_generator.py
-# Here, we just check if the top-level 'Pyllusion' package within 'generators' can be found.
 try:
-    # We are checking if the package 'Pyllusion' (which is generators/Pyllusion) can be found
     pyllusion_spec = importlib.util.find_spec("Pyllusion")
     if pyllusion_spec is None:
-        # If 'Pyllusion' itself is not found, try 'Pyllusion.pyllusion' if that's the actual module name
         pyllusion_spec = importlib.util.find_spec("Pyllusion.pyllusion")
     HAS_PYLLUSION = pyllusion_spec is not None
 except ImportError:
@@ -188,7 +172,7 @@ def main():
     # --- Optical Illusions Dataset ---
     if tasks_to_run['optical_illusions']:
         print_task_header("Optical Illusions Dataset")
-        if HAS_PYLLUSION: # Use the global HAS_PYLLUSION check from the top
+        if HAS_PYLLUSION: 
             try:
                 illusion_to_gen = None if args.illusion_type.lower() == "all" else args.illusion_type
                 optical_illusion_generator.main(specific_illusion=illusion_to_gen)

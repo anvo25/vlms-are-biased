@@ -1,39 +1,30 @@
-# generators/chess_board_generator.py
-# -*- coding: utf-8 -*-
 """
 Chess Board Generator - Generates "notitle" images of Chess boards
 with variations in rows/columns.
 """
 import os
 import shutil
-import svgwrite # For drawing the board
+import svgwrite 
 from tqdm import tqdm
 import sys
 
-# Use grid_utils for common board generation functionalities
 import grid_utils 
 
-# --- Constants for Chess Board ---
 STANDARD_BOARD_ROWS = 8
 STANDARD_BOARD_COLS = 8
-BOARD_TYPE_NAME = "Chess Board" # For metadata 'topic'
-BOARD_ID = "chess_board" # For directory and filename prefixing
-PIXEL_SIZES = [384, 768, 1152] # Standard resolutions
+BOARD_TYPE_NAME = "Chess Board"
+BOARD_ID = "chess_board" 
+PIXEL_SIZES = [384, 768, 1152] #
 
-# --- ChessBoard Class (Manages Dimensions and optional piece placement) ---
 class ChessBoard:
     """Represents a Chess board grid, allowing dimension modifications."""
     def __init__(self, rows=STANDARD_BOARD_ROWS, cols=STANDARD_BOARD_COLS):
         self.rows = max(1, rows)
         self.cols = max(1, cols)
-        # `pieces` could be used if we were drawing pieces, but for grid-only, it's not essential.
-        # self.pieces = {} # Example: {(file, rank): 'P'}
-        # For now, this class primarily manages dimensions.
 
     def add_row(self, position="last"):
         """Adds a row to the board. 'position' can be 'first' or 'last'."""
         insert_idx = 0 if position == "first" else self.rows # Insert at top or bottom
-        # If pieces were managed, their ranks would need adjustment here.
         self.rows += 1
         return {"action": "add_row", "dimension": "row", "position_added": position, "insert_index": insert_idx}
 
@@ -68,15 +59,11 @@ def draw_chess_board_svg(board_obj, render_size=800, show_coords=False):
     """
     if board_obj.rows <= 0 or board_obj.cols <= 0: return ""
 
-    # Determine square size based on the larger dimension to fit within render_size
-    # Add a small margin around the board.
     margin_ratio = 0.05 # 5% margin
     effective_render_size = render_size * (1 - 2 * margin_ratio)
     
     square_width = effective_render_size / board_obj.cols
     square_height = effective_render_size / board_obj.rows
-    # For a proportional board, usually square_width == square_height.
-    # If we want strictly square cells, take the minimum.
     actual_square_size = min(square_width, square_height)
 
     board_pixel_width = board_obj.cols * actual_square_size
@@ -87,12 +74,9 @@ def draw_chess_board_svg(board_obj, render_size=800, show_coords=False):
     total_svg_height = board_pixel_height + 2 * margin_pixels
 
     dwg = svgwrite.Drawing(size=(f"{total_svg_width:.2f}", f"{total_svg_height:.2f}"), profile='tiny')
-    # Optional: background for the whole SVG (e.g., if margins are transparent)
-    # dwg.add(dwg.rect(insert=(0,0), size=(total_svg_width, total_svg_height), fill="#cccccc")) # Light grey bg
 
-    # Colors for the squares
-    color_light = "#f0d9b5" # Typical light square color
-    color_dark = "#b58863"  # Typical dark square color
+    color_light = "#f0d9b5" 
+    color_dark = "#b58863" 
 
     grid_origin_x = margin_pixels
     grid_origin_y = margin_pixels
@@ -102,30 +86,24 @@ def draw_chess_board_svg(board_obj, render_size=800, show_coords=False):
             square_x = grid_origin_x + c_idx * actual_square_size
             square_y = grid_origin_y + r_idx * actual_square_size
             
-            # Determine square color based on position (alternating pattern)
             current_color = color_light if (r_idx + c_idx) % 2 == 0 else color_dark
             
             dwg.add(dwg.rect(insert=(square_x, square_y), size=(actual_square_size, actual_square_size),
                              fill=current_color, stroke=grid_utils.sanitize_filename("none"))) # No stroke for individual squares usually
 
-    # Optional: Add an outer border for the board area
     dwg.add(dwg.rect(insert=(grid_origin_x, grid_origin_y), size=(board_pixel_width, board_pixel_height),
                      fill="none", stroke="#333333", stroke_width=max(1, render_size/400.0)))
     
-    # show_coords logic would go here if needed, but paper says no coordinates for board tasks.
 
     svg_content_str = dwg.tostring()
     if not svg_content_str.startswith('<?xml'):
         svg_content_str = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + svg_content_str
     return svg_content_str
 
-# --- Main Dataset Generation Function ---
 def create_chess_board_dataset(quality_scale=5.0, svg_size=800):
     """
     Generates the "notitle" Chess Board dataset with variations.
     """
-    # Get the directory structure for "notitle" outputs for this board type
-    # `grid_utils.create_directory_structure` expects the sanitized board ID.
     output_dirs = grid_utils.create_directory_structure(BOARD_ID)
     temp_dir_path = output_dirs["temp_dir"]
 
@@ -134,7 +112,6 @@ def create_chess_board_dataset(quality_scale=5.0, svg_size=800):
     print(f"  Starting {BOARD_TYPE_NAME} 'notitle' dataset generation...")
     print(f"    Standard Size: {STANDARD_BOARD_ROWS} rows x {STANDARD_BOARD_COLS} columns")
 
-    # Define variations for chess board (add/remove row/col from first/last)
     variations_specs = [
         {"name": "remove_first_row", "action_func": lambda b: b.remove_row("first")},
         {"name": "remove_last_row",  "action_func": lambda b: b.remove_row("last")},
@@ -198,7 +175,6 @@ def create_chess_board_dataset(quality_scale=5.0, svg_size=800):
         base_id_prefix = f"{BOARD_ID}_{var_idx+1:02d}_{dimension_focus}_{sanitized_variation_name}"
 
         for px_size in PIXEL_SIZES:
-            # Filename for the "notitle" image (no "notitle" in name, as it's implied by output dir)
             # Format: <base_id_prefix>_px<size>.png
             img_basename = f"{base_id_prefix}_px{px_size}.png"
             temp_png_path = os.path.join(temp_dir_path, img_basename)
@@ -209,10 +185,7 @@ def create_chess_board_dataset(quality_scale=5.0, svg_size=800):
                 print(f"  ERROR: SVG generation failed for {img_basename}. Skipping size {px_size}.")
                 progress_bar.update(1); continue
 
-            # Scale for SVG to PNG conversion
-            # Assuming svg_size (render_size for SVG) is the reference for px_size output.
-            # If px_size is different from svg_size, scaling might be needed.
-            # For simplicity, using a fixed quality scale adjusted by pixel ratio if desired.
+          
             current_scale = quality_scale * (px_size / float(svg_size if svg_size > 0 else px_size) )
             
             if not grid_utils.svg_to_png_direct(board_svg_content, temp_png_path, 
@@ -274,17 +247,13 @@ def create_chess_board_dataset(quality_scale=5.0, svg_size=800):
 
     progress_bar.close()
 
-    # Save all collected "notitle" metadata for Chess Board
     print(f"\n  Saving 'notitle' metadata for {BOARD_TYPE_NAME}...")
-    # `grid_utils.write_metadata_files` expects `dirs` (from create_directory_structure),
-    # and a `board_id_prefix` (which is BOARD_ID here for the combined file).
     grid_utils.write_metadata_files(
         all_notitle_metadata,
         output_dirs, # Contains "notitle_meta_dir"
         BOARD_ID     # Used to form filename like "chess_board_notitle_metadata.json"
     )
 
-    # Summary for this generator
     final_img_count = 0
     try:
         if os.path.exists(output_dirs["notitle_img_dir"]):
@@ -295,7 +264,6 @@ def create_chess_board_dataset(quality_scale=5.0, svg_size=800):
     print(f"  Actual 'notitle' images generated: {final_img_count} (Expected: {total_images_to_generate})")
     print(f"  Total 'notitle' metadata entries created: {len(all_notitle_metadata)}")
     
-    # Clean up temp directory
     try:
         if os.path.exists(temp_dir_path):
             shutil.rmtree(temp_dir_path)
@@ -307,9 +275,7 @@ def create_chess_board_dataset(quality_scale=5.0, svg_size=800):
 
 if __name__ == '__main__':
     print(f"Testing {BOARD_TYPE_NAME} Generator directly...")
-    # This requires grid_utils.py to be importable
-    # And will create output directories in the current working directory
-    if not os.path.exists("vlms-are-biased-notitle"): # Ensure parent for test
+    if not os.path.exists("vlms-are-biased-notitle"): 
         os.makedirs("vlms-are-biased-notitle")
     create_chess_board_dataset(quality_scale=5.0, svg_size=800)
     print(f"\nDirect test of {BOARD_TYPE_NAME} Generator complete.")

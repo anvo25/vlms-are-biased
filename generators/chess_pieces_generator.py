@@ -1,5 +1,3 @@
-# generators/chess_pieces_generator.py
-# -*- coding: utf-8 -*-
 """
 Generates the "notitle" Chess Pieces dataset.
 Modifies a standard chess starting position by removing or replacing one piece.
@@ -15,20 +13,13 @@ import sys
 import matplotlib.font_manager
 matplotlib.font_manager._load_fontmanager(try_read_cache=False)
 
-# Assuming utils.py is in the parent directory of 'generators/'
-# Adjust path if utils.py is moved elsewhere relative to this script's execution context.
-# For package structure, direct import might work if main.py handles PYTHONPATH or similar.
-# Safest is often relative imports if running as part of a package, or ensuring PYTHONPATH.
-# For now, assuming `utils` is accessible.
 from utils import (sanitize_filename, svg_to_png_direct, 
-                   save_metadata_files, TITLE_TYPES) # TITLE_TYPES might not be needed here directly
+                   save_metadata_files, TITLE_TYPES) 
 
-# --- Global Constants ---
-PIXEL_SIZES = [384, 768, 1152]  # Standard resolutions for generated images
-NUM_ACTION_GROUPS = 12  # Number of unique target squares for modifications
-ACTIONS_PER_GROUP = 2   # For each target square, we have two actions: Remove and Replace
-TOPIC_NAME = "chess_pieces" # Used for metadata and file naming
-
+PIXEL_SIZES = [384, 768, 1152] 
+NUM_ACTION_GROUPS = 12  
+ACTIONS_PER_GROUP = 2   
+TOPIC_NAME = "chess_pieces"
 # --- Helper Functions ---
 def piece_to_name(piece_symbol_str):
     """Converts a chess piece symbol (e.g., 'P', 'n') to its full descriptive name."""
@@ -171,9 +162,8 @@ def generate_single_chess_notitle_image_and_meta(
             f"How many chess pieces are there on this board? Answer with a number in curly brackets, e.g., {{9}}.",
             f"Count the chess pieces on this board. Answer with a number in curly brackets, e.g., {{9}}."
         ]
-        expected_bias_q1_q2 = str(standard_piece_counts["total"]) # Bias is the standard total count
+        expected_bias_q1_q2 = str(standard_piece_counts["total"]) 
     elif action_verb == 'Replace':
-        # Count pieces of the *newly placed* type
         num_white_added_type = len(current_modified_board.pieces(new_piece_if_replace.piece_type, chess.WHITE))
         num_black_added_type = len(current_modified_board.pieces(new_piece_if_replace.piece_type, chess.BLACK))
         total_of_added_type = num_white_added_type + num_black_added_type
@@ -184,47 +174,35 @@ def generate_single_chess_notitle_image_and_meta(
         ]
         expected_bias_q1_q2 = str(standard_piece_counts.get(piece_added_type_for_prompt, "0"))
 
-    # Q3: Standard position check (always "No" because the board is modified)
     prompt_q3 = "Is this the Chess starting position? Answer in curly brackets, e.g., {Yes} or {No}."
     ground_truth_q3 = "No"
-    expected_bias_q3 = "Yes" # Biased answer assumes standard position
+    expected_bias_q3 = "Yes" 
 
-    # Generate images and metadata entries for each specified resolution
     for px_size in pixel_sizes_list:
-        # Construct piece information string for the filename
         if action_verb == 'Remove':
             piece_modification_info_str = f"{sanitized_orig_piece_name}_at_{square_algebraic_name}"
         else: # Replace
             sanitized_added_piece_name = sanitize_filename(piece_added_descriptive_name)
             piece_modification_info_str = f"{sanitized_orig_piece_name}_to_{sanitized_added_piece_name}_at_{square_algebraic_name}"
 
-        # Filename for the "notitle" image
-        # Format: <topic>_<group_id>_<action>_<piece_info>_notitle_px<size>.png
         img_basename = f"{topic_name_constant}_{group_id_formatted}_{action_verb_lower}_{piece_modification_info_str}_notitle_px{px_size}.png"
         
-        # Full path for the final "notitle" PNG image
         final_png_path = os.path.join(output_dirs_struct["img_dirs"]['notitle'], img_basename)
         
-        # Generate SVG content for the modified board
-        # No coordinates shown on the board image itself
         board_svg_content = chess.svg.board(board=current_modified_board, size=svg_render_size, coordinates=False)
         
-        # Adjust SVG to PNG conversion scale based on pixel size for consistent quality
         scale_for_conversion = png_quality_scale * (px_size / 768.0) # Assuming 768px is reference for base scale
         
-        # Ensure the output directory for the image exists
         os.makedirs(os.path.dirname(final_png_path), exist_ok=True)
         
         # Convert SVG to PNG and save
         if not svg_to_png_direct(board_svg_content, final_png_path, scale_for_conversion, px_size):
             print(f"  ERROR: Failed to generate PNG for {img_basename}. Skipping this resolution.")
             progress_bar_updater.update(1) # Still update progress for the attempt
-            continue # Skip to next resolution or action
+            continue 
         
-        progress_bar_updater.update(1) # Successful image generation
+        progress_bar_updater.update(1) 
         
-        # --- Prepare Metadata Entry ---
-        # Common metadata details for this specific action and resolution
         common_metadata_payload = {
              "group_id": group_id, # The group this action belongs to
              "action_type": action_verb, # 'Remove' or 'Replace'
@@ -232,29 +210,25 @@ def generate_single_chess_notitle_image_and_meta(
              "piece_removed_info": original_piece_descriptive_name, # e.g., "White_Pawn"
              "piece_added_info": piece_added_descriptive_name,   # e.g., "White_Knight" or "N/A"
              "pixel_size": px_size,
-             # Add any other relevant details specific to this action if needed
         }
         
-        # Relative path for the image, to be stored in metadata
         image_path_relative = os.path.join("images", img_basename).replace("\\", "/")
 
-        # Create metadata entries for Q1 and Q2
         for q_idx, current_prompt_text in enumerate(prompts_q1_q2):
             question_type_label = f"Q{q_idx + 1}"
-            # Unique ID for this metadata entry
             meta_entry_id = f"{topic_name_constant}_{group_id_formatted}_{action_verb_lower}_{piece_modification_info_str}_notitle_px{px_size}_{question_type_label}"
             
             generated_metadata_for_action.append({
                  "ID": meta_entry_id, 
                  "image_path": image_path_relative,
-                 "topic": "Chess Pieces", # Standardized topic display name
+                 "topic": "Chess Pieces", 
                  "prompt": current_prompt_text,
                  "ground_truth": ground_truth_q1_q2, 
                  "expected_bias": expected_bias_q1_q2,
-                 "with_title": False, # This is a "notitle" image
+                 "with_title": False, 
                  "type_of_question": question_type_label,
-                 "pixel": px_size, # Redundant with common_meta, but often useful at top level
-                 "metadata": common_metadata_payload.copy() # Store detailed payload
+                 "pixel": px_size, 
+                 "metadata": common_metadata_payload.copy()
             })
             
         # Create metadata entry for Q3
@@ -274,13 +248,11 @@ def generate_single_chess_notitle_image_and_meta(
 
     return generated_metadata_for_action
 
-# --- Main Dataset Generation Function (Notitle Only) ---
 def create_chess_notitle_dataset(dirs, quality_scale=5.0, svg_size=800):
     """
     Generates the "notitle" Chess Pieces dataset.
     `dirs` is the structure returned by `utils.create_directory_structure` for "notitle".
     """
-    # Standard topic name, used consistently
     current_topic_name = TOPIC_NAME
     
     print(f"  Starting {current_topic_name.replace('_',' ').title()} 'notitle' dataset generation...")
@@ -290,33 +262,28 @@ def create_chess_notitle_dataset(dirs, quality_scale=5.0, svg_size=800):
     print(f"    - Total images expected: {total_images_to_generate}")
 
     all_notitle_metadata_entries = []
-    base_chess_board = chess.Board()  # Standard chess starting position
+    base_chess_board = chess.Board()  
 
-    # Select action groups (target squares and modifications)
     selected_action_groups = select_chess_action_groups(base_chess_board, NUM_ACTION_GROUPS)
     if not selected_action_groups or len(selected_action_groups) < NUM_ACTION_GROUPS:
          print(f"  FATAL ERROR: Could not define the required {NUM_ACTION_GROUPS} action groups for Chess Pieces. Generation aborted.")
-         # No system exit here, main.py handles overall flow. This function just returns.
          return
 
-    # Initialize progress bar
     progress_bar = tqdm(total=total_images_to_generate, 
                         desc=f"Generating Chess Pieces", unit="image", ncols=100)
 
-    # Iterate through each defined action group
     for group_definition in selected_action_groups:
         current_group_id = group_definition['group_id']
-        # Process each action (Remove, Replace) defined for this group
         for action_spec_details in group_definition['actions_in_group']:
             metadata_for_this_action = generate_single_chess_notitle_image_and_meta(
                 current_group_id, 
                 action_spec_details, 
-                base_chess_board, # Pass the original board state
-                dirs, # This is the 'notitle' specific dir structure from main.py
+                base_chess_board, 
+                dirs, 
                 PIXEL_SIZES, 
                 quality_scale, 
                 svg_size, 
-                progress_bar, # Pass the tqdm object for updates
+                progress_bar, 
                 current_topic_name
             )
             all_notitle_metadata_entries.extend(metadata_for_this_action)
@@ -325,19 +292,14 @@ def create_chess_notitle_dataset(dirs, quality_scale=5.0, svg_size=800):
     if progress_bar.n < progress_bar.total:
          print(f"  Warning: Chess Pieces generation progress ({progress_bar.n}/{progress_bar.total}) indicates some images may have been skipped. Check logs.")
 
-    # --- Save All Collected "notitle" Metadata ---
     print(f"\n  Saving metadata for {current_topic_name}...")
-    # `dirs["meta_dirs"]["notitle"]` is the path like "vlms-are-biased-notitle/chess_pieces/"
-    # `save_metadata_files` expects base_filename_prefix like "chess_pieces_notitle"
     save_metadata_files(
         all_notitle_metadata_entries, 
         dirs["meta_dirs"]['notitle'], 
-        f"{current_topic_name}_notitle" # e.g., chess_pieces_notitle
+        f"{current_topic_name}_notitle" 
     )
 
-    # --- Final Summary for this Generator ---
     print(f"\n  --- Chess Pieces 'notitle' Generation Summary ---")
-    # Count actual image files generated for verification
     final_image_files_count = 0
     try:
         img_output_dir = dirs["img_dirs"]['notitle']
@@ -349,12 +311,9 @@ def create_chess_notitle_dataset(dirs, quality_scale=5.0, svg_size=800):
     print(f"  Actual 'notitle' images generated: {final_image_files_count} (Expected: {total_images_to_generate})")
     print(f"  Total 'notitle' metadata entries created: {len(all_notitle_metadata_entries)}")
     
-    # Temporary directory cleanup is handled by the caller (main.py) if it passes a shared temp dir,
-    # or if this generator creates its own, it should clean it.
-    # For now, assuming main.py might handle a general temp area or individual cleanup.
-    # If `dirs["temp_dir"]` is specific to this topic, cleanup here:
+
     try:
-        temp_dir_to_clean = dirs.get("temp_dir") # temp_chess_pieces_output
+        temp_dir_to_clean = dirs.get("temp_dir")
         if temp_dir_to_clean and os.path.exists(temp_dir_to_clean):
             shutil.rmtree(temp_dir_to_clean)
             print(f"  Cleaned up temporary directory: {temp_dir_to_clean}")
@@ -363,22 +322,13 @@ def create_chess_notitle_dataset(dirs, quality_scale=5.0, svg_size=800):
     
     print(f"  Chess Pieces 'notitle' dataset generation finished.")
 
-# This allows running the generator directly for testing if needed,
-# though typical use is via main.py
 if __name__ == '__main__':
     print("Testing Chess Pieces Generator directly...")
-    # For direct testing, we need to create a mock `dirs` structure.
-    # This is usually provided by `utils.create_directory_structure` called from `main.py`.
-    
-    # Create a temporary structure for testing
+  
     test_topic_name = TOPIC_NAME
-    # Mocking the create_directory_structure from utils.py for standalone run
-    # This is simplified; real one is in utils.py.
-    
-    # Need to import create_directory_structure from the main utils.py for this test
     from utils import create_directory_structure as util_create_dirs
 
-    if not os.path.exists("vlms-are-biased-notitle"): # Ensure parent exists for test
+    if not os.path.exists("vlms-are-biased-notitle"): 
         os.makedirs("vlms-are-biased-notitle")
     
     # Create 'notitle' directories for this topic

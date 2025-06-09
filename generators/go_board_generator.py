@@ -1,22 +1,19 @@
-# generators/go_board_generator.py
-# -*- coding: utf-8 -*-
 """
 Go Board Generator - Generates "notitle" images of Go boards
 with variations in rows/columns.
 """
 import os
 import shutil
-import svgwrite # For drawing the Go board
+import svgwrite 
 from tqdm import tqdm
 import sys
 
-import grid_utils # Common utilities for grid/board generators
+import grid_utils 
 
-# --- Constants for Go Board ---
 STANDARD_BOARD_ROWS = 19
 STANDARD_BOARD_COLS = 19
-BOARD_TYPE_NAME = "Go Board" # For metadata 'topic'
-BOARD_ID = "go_board"    # For directory and filename prefixing
+BOARD_TYPE_NAME = "Go Board" 
+BOARD_ID = "go_board"    
 PIXEL_SIZES = [384, 768, 1152]
 
 # --- GoBoard Class ---
@@ -25,8 +22,8 @@ class GoBoard:
     def __init__(self, rows=STANDARD_BOARD_ROWS, cols=STANDARD_BOARD_COLS):
         self.rows = max(1, rows)
         self.cols = max(1, cols)
-        self.stones = {} # Stores stone color ('B' or 'W') at square_index (rank * cols + file)
-        self._add_common_pattern() # Add a few stones for visual interest
+        self.stones = {}
+        self._add_common_pattern() 
 
     def _to_square_index(self, file_idx, rank_idx):
         if 0 <= file_idx < self.cols and 0 <= rank_idx < self.rows:
@@ -122,17 +119,13 @@ def draw_go_board_svg(board_obj, render_size=800):
     """Generates an SVG string for a Go board with grid lines and stones."""
     if board_obj.rows <= 0 or board_obj.cols <= 0: return ""
 
-    # Margin around the grid
-    margin = render_size * 0.05  # 5% margin
+    margin = render_size * 0.05  
     
-    # The Go grid is drawn on intersections, so we need (rows-1) intervals vertically
-    # and (cols-1) intervals horizontally.
-    # Effective drawing area for the grid itself:
+    
     grid_area_width = render_size - 2 * margin
     grid_area_height = render_size - 2 * margin
 
-    # Size of one "square" or interval in the grid
-    # If rows/cols is 1, there are 0 intervals, handle to avoid division by zero.
+    
     interval_width = grid_area_width / (board_obj.cols - 1) if board_obj.cols > 1 else grid_area_width
     interval_height = grid_area_height / (board_obj.rows - 1) if board_obj.rows > 1 else grid_area_height
 

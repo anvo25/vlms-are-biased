@@ -1,5 +1,3 @@
-# generators/xiangqi_pieces_generator.py
-# -*- coding: utf-8 -*-
 """
 Generates the "notitle" Xiangqi (Chinese Chess) Pieces dataset.
 Modifies a standard Xiangqi starting position by removing or replacing one piece.

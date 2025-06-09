@@ -1,5 +1,3 @@
-# generators/logos_generator.py
-# -*- coding: utf-8 -*-
 """
 Logos Dataset Generator - Generates "notitle" images with logo-related tasks
 Supports both car logos and shoe logos generation.
@@ -24,11 +22,9 @@ try:
 except ImportError:
     HAS_GENAI = False
 
-# Use common utilities
 try:
     from utils import sanitize_filename, save_metadata_files
 except ImportError:
-    # Fallback sanitize function if utils not available
     import re
     def sanitize_filename(name_str):
         name_str = str(name_str).replace(' ', '_').lower()
@@ -40,15 +36,12 @@ except ImportError:
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(metadata_list, f, indent=2, ensure_ascii=False)
 
-# --- Configuration ---
 RESOLUTIONS = [384, 768, 1152]  # Standard resolutions
 BASE_NOTITLE_OUTPUT_DIR = "vlms-are-biased-notitle"
 LOGO_RESOURCES_DIR = "logo_resources"
 
-# API configuration - should be set externally or via environment
-API_KEY = os.environ.get('GEMINI_API_KEY')  # Note: In production, use environment variables
+API_KEY = os.environ.get('GEMINI_API_KEY')  
 
-# Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Car data for logo generation

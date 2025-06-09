@@ -1,5 +1,4 @@
-# utils.py
-# -*- coding: utf-8 -*-
+
 import os
 import re
 import json
@@ -11,16 +10,14 @@ from PIL import ImageDraw, ImageFont
 import cairosvg 
 import textwrap
 
-# --- Global Constants ---
 TITLE_TYPES = ['notitle', 'in_image_title']
 
-# --- Default Title Texts for 'in_image_title' if file is missing/empty ---
 DEFAULT_IN_IMAGE_TITLES = {
-    "chess_pieces": "Chess starting position", # Paper uses "Chess starting position"
+    "chess_pieces": "Chess starting position", 
     "xiangqi_pieces": "Xiangqi starting position",
-    "chess_board": "Chess", # Paper uses "Chess"
-    "sudoku_board": "Sudoku", # Paper uses "Sudoku"
-    "go_board": "Go", # Paper uses "Go"
+    "chess_board": "Chess",
+    "sudoku_board": "Sudoku", #
+    "go_board": "Go",
     "xiangqi_board": "Xiangqi",
     "ebbinghaus_illusion": "Ebbinghaus illusion",
     "mullerlyer_illusion": "Müller-Lyer illusion",
@@ -30,10 +27,9 @@ DEFAULT_IN_IMAGE_TITLES = {
     "zollner_illusion": "Zöllner illusion",
     "dice_patterned_grid": "Patterned Grid",
     "tally_patterned_grid": "Patterned Grid",
-    # Add defaults for animals, logos, flags if they become active
-    "animals": "", # Placeholder, no default title
-    "logos": "", # Placeholder, no default title
-    "flags": "", # Placeholder, no default title
+    "animals": "", 
+    "logos": "", 
+    "flags": "", 
 }
 
 

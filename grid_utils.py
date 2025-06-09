@@ -1,5 +1,3 @@
-# grid_utils.py
-# -*- coding: utf-8 -*-
 """
 Common utility functions for all board/grid type dataset generators.
 (e.g., Chess Board, Go Board, Sudoku Board, Xiangqi Board)
@@ -9,10 +7,9 @@ specific metadata structures.
 import os
 import re
 import json
-import shutil # For file operations like copy if needed, though not used in current functions
+import shutil 
 import pandas as pd
 
-# Assuming cairosvg is a primary dependency, managed in requirements.txt
 try:
     from cairosvg import svg2png
     HAS_CAIROSVG = True
@@ -27,15 +24,11 @@ except ImportError:
     print("# correctly installed on your system.                            #")
     print("####################################################################")
 
-# Using sanitize_filename from the main utils.py to avoid duplication
-# This assumes utils.py is in a location Python can find (e.g., parent dir added to sys.path by main script,
-# or project installed as a package).
 try:
     from utils import sanitize_filename as common_sanitize_filename
 except ImportError:
     print("ERROR in grid_utils.py: Could not import common_sanitize_filename from utils.py.")
     print("Ensure utils.py is accessible in the Python path.")
-    # Fallback to a local simple version if main utils is not found during isolated test
     def common_sanitize_filename(name_str):
         name_str = str(name_str)
         name_str = re.sub(r'[^\w\-]+', '_', name_str)
@@ -166,7 +159,6 @@ def write_metadata_files(metadata_rows_list, dirs_struct, board_id_filename_pref
             
             if isinstance(nested_meta_dict, dict): # Ensure it's a dict before iterating
                 for meta_key, meta_value in nested_meta_dict.items():
-                    # Prefix keys from the sub-dictionary with 'meta_' to avoid column name clashes
                     # Serialize complex types (like dicts/lists within metadata) to JSON strings for CSV
                     entry_copy[f'meta_{meta_key}'] = json.dumps(meta_value) if isinstance(meta_value, (dict, list)) else meta_value
             elif nested_meta_dict is not None: # If 'metadata' was some other non-null, non-dict value

@@ -1,5 +1,4 @@
-# generators/animals_generator.py
-# -*- coding: utf-8 -*-
+
 import os
 import json
 import time
@@ -10,20 +9,16 @@ from PIL import Image
 from tqdm import tqdm
 import argparse
 
-# Try to import required dependencies
 try:
-    # import google.generativeai as genai
     from google import genai
     from google.genai import types
     HAS_GENAI = True
 except ImportError:
     HAS_GENAI = False
 
-# Use common utilities
 try:
     from utils import sanitize_filename, save_metadata_files
 except ImportError:
-    # Fallback sanitize function if utils not available
     import re
     def sanitize_filename(name_str):
         name_str = str(name_str).replace(' ', '_').lower()
@@ -460,7 +455,6 @@ def create_metadata_entries(metadata_list, animal, modification_type, trial, res
             }
         })
     
-    # Create entry for Q3 (typical number check)
     metadata_list.append({
         "ID": f"{base_id}_Q3",
         "image_path": image_path_relative,

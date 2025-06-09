@@ -1,5 +1,3 @@
-# generators/optical_illusion_generator.py
-# -*- coding: utf-8 -*-
 """
 Optical Illusions Dataset Generator - "notitle" versions only.
 Generates specified optical illusions at multiple resolutions.
@@ -8,31 +6,25 @@ Metadata saved per illusion type and combined.
 import os
 import json
 import random
-import logging # Using logging module for messages
+import logging 
 import shutil
 import pandas as pd
-import argparse # Keep for standalone execution or specific illusion selection
+import argparse 
 from tqdm import tqdm
 
-# Pyllusion is a core dependency for this generator
 try:
     from Pyllusion import pyllusion
     HAS_PYLLUSION = True
 except ImportError:
     HAS_PYLLUSION = False
-    # Logging will be used to show this error if main() is called without Pyllusion
 
-# Use common utilities
 from utils import sanitize_filename as common_sanitize_filename # Using the one from main utils
 from utils import save_metadata_files # For saving JSON/CSV
 
 # --- Configuration ---
 RESOLUTIONS = [384, 768, 1152] # Standard resolutions
-# Define all available illusion types this generator can produce
 ALL_ILLUSION_TYPES = ["Ebbinghaus", "MullerLyer", "Ponzo", "VerticalHorizontal", "Zollner", "Poggendorff"]
-# This will be set in main() based on command line args or if called from another script.
-# Default to all if not specified.
-# ILLUSION_TYPES_TO_GENERATE = ALL_ILLUSION_TYPES.copy() # This global will be set by main()
+
 
 # Base output directory for "notitle" illusions
 BASE_NOTITLE_OUTPUT_DIR = "vlms-are-biased-notitle"
@@ -276,8 +268,7 @@ def _generate_illusion_images_and_metadata(
     return all_metadata_for_this_illusion
 
 
-# --- Main function for this generator module ---
-def main(specific_illusion=None): # `specific_illusion` can be a string like "Ebbinghaus" or None for all
+def main(specific_illusion=None): 
     """
     Main function to generate "notitle" optical illusion datasets.
     If `specific_illusion` is provided, only that illusion is generated.
@@ -298,15 +289,13 @@ def main(specific_illusion=None): # `specific_illusion` can be a string like "Eb
     elif specific_illusion:
         logging.error(f"Specified illusion type '{specific_illusion}' is not recognized. Available: {ALL_ILLUSION_TYPES}")
         return
-    else: # Should not be reached if logic is correct
+    else:
         illusion_types_to_process = ALL_ILLUSION_TYPES
 
 
     logging.info(f"Starting 'notitle' optical illusion dataset generation for resolutions: {RESOLUTIONS}")
 
-    # Ensure base "notitle" output directory exists
     os.makedirs(BASE_NOTITLE_OUTPUT_DIR, exist_ok=True)
-    # Create or clear the temporary directory for this generator's run
     if os.path.exists(TEMP_OUTPUT_DIR_BASE):
         shutil.rmtree(TEMP_OUTPUT_DIR_BASE)
     os.makedirs(TEMP_OUTPUT_DIR_BASE, exist_ok=True)
@@ -314,9 +303,6 @@ def main(specific_illusion=None): # `specific_illusion` can be a string like "Eb
 
     all_illusion_configs = define_illusion_parameters_config()
     
-    # To store metadata from all illusions if we want a combined file later (optional here)
-    # For now, saving per-illusion type.
-    # combined_notitle_metadata_all_illusions = [] 
 
     for illusion_key_name in illusion_types_to_process:
         if illusion_key_name not in all_illusion_configs:
@@ -325,24 +311,15 @@ def main(specific_illusion=None): # `specific_illusion` can be a string like "Eb
             
         logging.info(f"--- Processing {illusion_key_name} illusion ---")
         
-        # Sanitize name for directory creation (e.g., "VerticalHorizontal" -> "verticalhorizontal_illusion")
-        # For illusions, the key name is usually already good, but good practice.
-        # The paper uses names like "ebbinghaus illusion", "mullerlyer illusion" for topics.
-        # Let's create dir names like "ebbinghaus_illusion".
+    
         illusion_dir_name = sanitize_filename(f"{illusion_key_name}_illusion".lower())
 
-        # Create output directories for this specific illusion type
         current_illusion_output_dirs = _create_illusion_output_dirs(illusion_dir_name)
         
         current_illusion_params = all_illusion_configs[illusion_key_name]
         param_combos = _generate_parameter_combinations_for_illusion(current_illusion_params)
         
-        # (Optional: Balance check - from original script)
-        # diff_zero_count = sum(1 for combo in param_combos if combo["is_difference_zero"])
-        # diff_nonzero_count = len(param_combos) - diff_zero_count
-        # logging.info(f"  {illusion_key_name}: {len(param_combos)} param combinations ({diff_zero_count} diff=0, {diff_nonzero_count} diff!=0)")
-        # if diff_zero_count != diff_nonzero_count:
-        #    logging.warning(f"  IMBALANCE for {illusion_key_name}: diff=0 ({diff_zero_count}) != diff!=0 ({diff_nonzero_count})")
+    
 
         metadata_for_this_type = _generate_illusion_images_and_metadata(
             illusion_key_name, 
@@ -354,16 +331,13 @@ def main(specific_illusion=None): # `specific_illusion` can be a string like "Eb
         
         # Save metadata for this specific illusion type
         if metadata_for_this_type:
-            # Filename prefix: e.g., "ebbinghaus_illusion_notitle"
             meta_filename_prefix = f"{illusion_dir_name}_notitle"
             save_metadata_files(
                 metadata_for_this_type, 
                 current_illusion_output_dirs["base_dir"], # Save to "vlms-are-biased-notitle/ebbinghaus_illusion/"
                 meta_filename_prefix
             )
-        # combined_notitle_metadata_all_illusions.extend(metadata_for_this_type) # If a combined file was desired
 
-    # Cleanup temporary directory after all illusions are processed
     try:
         if os.path.exists(TEMP_OUTPUT_DIR_BASE):
             shutil.rmtree(TEMP_OUTPUT_DIR_BASE)
@@ -372,9 +346,7 @@ def main(specific_illusion=None): # `specific_illusion` can be a string like "Eb
         logging.warning(f"  Failed to clean up temporary directory '{TEMP_OUTPUT_DIR_BASE}': {e}")
 
     logging.info("--- Optical Illusion 'notitle' dataset generation complete ---")
-    # (Summary printing can be added here if desired, like counting total images generated)
 
-# This allows the script to be run directly for illusion generation
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate Optical Illusion "notitle" datasets.')
     parser.add_argument('--illusion', type=str, choices=ALL_ILLUSION_TYPES + ["all"], default="all",
@@ -382,7 +354,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     illusion_to_run = args.illusion
-    if args.illusion == "all": # For clarity, if CLI says "all", main takes None
+    if args.illusion == "all":
         illusion_to_run = None
 
     main(specific_illusion=illusion_to_run)

@@ -1,5 +1,4 @@
-# generators/flag_generator.py
-# -*- coding: utf-8 -*-
+
 """
 Flag Dataset Generator - Generates "notitle" images with flag stripe counting tasks
 Uses WikimediaSVGRetriever to download flag SVGs and LLM to modify stripe counts.
@@ -14,7 +13,6 @@ from lxml import etree
 from PIL import Image
 from tqdm import tqdm
 
-# Try to import required dependencies
 try:
     from sentence_transformers import SentenceTransformer, util
     HAS_SENTENCE_TRANSFORMERS = True

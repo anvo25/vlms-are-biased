@@ -1,5 +1,3 @@
-# generators/patterned_grid_generator.py
-# -*- coding: utf-8 -*-
 """
 Patterned Grid Generator - Generates "notitle" images of grids with
 dice-like circle patterns or tally mark patterns, with one anomalous cell.
@@ -8,20 +6,15 @@ Outputs to 'dice' and 'tally' subdirectories under vlms-are-biased-notitle/.
 import os
 import random
 import shutil
-import string # For column labels A, B, C...
-import math   # For shape drawing (star, triangle)
+import string 
+import math  
 from tqdm import tqdm
-import numpy as np # For grid layout calculations if needed
+import numpy as np 
 import sys
+import grid_utils 
+from utils import sanitize_filename 
 
-# Assuming grid_utils.py and utils.py are accessible from this script's execution context
-# (e.g. if main.py sets up paths or if run as part of a package)
-import grid_utils # For create_directory_structure, svg_to_png_direct
-from utils import sanitize_filename # For filenames
-
-# --- Global Constants ---
 PIXEL_SIZES = [384, 768, 1152]
-# Number of unique (grid_size, cell_selection_pair) combinations
 NUM_ACTION_GROUPS = 14 
 # For each group, we generate 2 grid types (dice, tally) and 2 action types (remove, replace/add)
 # So, total of 4 specific (grid_type, action_type) pairs per group.
