@@ -33,22 +33,40 @@
 
 *Large language models (LLMs) memorize a vast amount of prior knowledge from the Internet that help them on downstream tasks but also may notoriously sway their outputs towards wrong or biased answers. In this work, we test how the knowledge about popular subjects hurt the accuracy of vision language models (VLMs) on standard, objective visual tasks of counting and identification. We find that state-of-the-art VLMs are **strongly biased** (e.g., unable to recognize a fourth stripe has been added to a 3-stripe Adidas logo) scoring an average of 17.05% accuracy in counting (e.g., counting stripes in an Adidas-like logo) across 7 diverse domains from animals, logos, chess, boardgames, optical illusions, to patterned grids. Insert text (e.g., "Adidas") describing the subject name into the counterfactual image further decreases VLM accuracy. The biases in VLMs are so strong that instructing them to double-check their results or rely exclusively on image details to answer improves counting accuracy by only +2 points, on average. Our work presents an interesting failure mode in VLMs and an automated framework for testing VLM biases. Code and data are available at: [vlmsarebiased.github.io](https://vlmsarebiased.github.io)*
 
+
+---
+## 👋 Trying out our images on your model
+Use [these examples](./examples) where most tested models fail to answer.
+
+---
+
+## 🚀 Quick Start Guide
+
+### Option 1: Use Pre-built Dataset (Recommended for most users)
+
+**If you just want to use our dataset for evaluation or research:**
+
+📥 **Download the complete dataset from Hugging Face** with full images and prompts:
+- Go to our [Hugging Face dataset](https://huggingface.co/datasets/anvo25/vlms-are-biased)
+- Download ready-to-use images with corresponding prompts
+
+This is the fastest way to get started.
+
+### Option 2: Reproduce/Generate Dataset
+
+**If you want to reproduce our dataset generation process or create custom variations:**
+
+Please follow the installation and generation steps below to run the code locally.
+
 ---
 
 ## 💻 Getting Started
 
 ```bash
 git clone https://github.com/anvo25/vlms-are-biased.git
-cd VLMBias
+cd vlms-are-biased
 pip install -r requirements.txt
 ```
-
----
-## 👋 Trying out our images on your model
-Use [these examples](./examples) where most tested models fail to answer.
-
-## 💽 Download the entire benchmark dataset
-Go to our [huggingface dataset](https://huggingface.co/datasets/anvo25/vlms-are-biased) and select the task topic.
 
 ## 📊 Tasks
 
