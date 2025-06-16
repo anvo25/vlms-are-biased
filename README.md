@@ -42,7 +42,7 @@ Use [these examples](./examples) where most tested models fail to answer.
 
 ## 🚀 Quick Start Guide
 
-### Option 1: Use Pre-built Dataset (Recommended for most users)
+### Option 1: Use Pre-built Dataset (Recommended for testing your models)
 
 **If you just want to use our dataset for evaluation or research:**
 
