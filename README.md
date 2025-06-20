@@ -70,7 +70,7 @@ pip install -r requirements.txt
 
 ## 📊 Tasks
 
-To run the code to generate the images for a specific task, go to the following embedded links:
+To run the code to generate the **counterfactual** images for a specific task, go to the following embedded links:
 - **Chess Pieces**: [Chess pieces](generators/chess_pieces_generator.py), [Xiangqi pieces](generators/xiangqi_board_generator.py) (modified starting positions)
 - **Game Boards**: [Chess board](generators/chess_board_generator.py), [Go board](generators/go_board_generator.py), [Xiangqi board](generators/xiangqi_board_generator.py), [Sudoku board](generators/sudoku_board_generator.py) (dimension variations)  
 - **[Optical Illusions](generators/optical_illusion_generator.py)**: Ebbinghaus, Müller-Lyer, Ponzo, Vertical-Horizontal, Zöllner, Poggendorff  
