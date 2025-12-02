@@ -47,10 +47,52 @@ Use [these examples](./examples) where most tested models fail to answer.
 **If you just want to use our dataset for evaluation or research:**
 
 📥 **Download the complete dataset from Hugging Face** with full images and prompts:
+
+Please run the following script:
+```
+import datasets
+dataset = datasets.load_dataset('anvo25/vlms-are-biased')
+```
+This will return a DatasetDict with this structure:
+```
+DatasetDict({
+    main: Dataset({
+        features: ['image', 'ID', 'image_path', 'topic', 'sub_topic', 'prompt', 'ground_truth', 'expected_bias', 'with_title', 'type_of_question', 'pixel', 'metadata'],
+        num_rows: 2784
+    })
+    identification: Dataset({
+        features: ['image', 'ID', 'image_path', 'topic', 'sub_topic', 'prompt', 'ground_truth', 'expected_bias', 'with_title', 'type_of_question', 'pixel', 'metadata'],
+        num_rows: 1392
+    })
+    withtitle: Dataset({
+        features: ['image', 'ID', 'image_path', 'topic', 'sub_topic', 'prompt', 'ground_truth', 'expected_bias', 'with_title', 'type_of_question', 'pixel', 'metadata'],
+        num_rows: 2784
+    })
+    original: Dataset({
+        features: ['image', 'ID', 'image_path', 'topic', 'sub_topic', 'prompt', 'ground_truth', 'expected_bias', 'with_title', 'type_of_question', 'pixel', 'metadata'],
+        num_rows: 458
+    })
+    remove_background_q1q2: Dataset({
+        features: ['image', 'ID', 'image_path', 'topic', 'sub_topic', 'prompt', 'ground_truth', 'expected_bias', 'with_title', 'type_of_question', 'pixel', 'metadata'],
+        num_rows: 2784
+    })
+    remove_background_q3: Dataset({
+        features: ['image', 'ID', 'image_path', 'topic', 'sub_topic', 'prompt', 'ground_truth', 'expected_bias', 'with_title', 'type_of_question', 'pixel', 'metadata'],
+        num_rows: 1392
+    })
+})
+```
+- `main`: our counting dataset of counterfactual images used throughout the paper
+- `identification`: our identification dataset of counterfactual images in Section 4.3
+- `withtitle`: our counting dataset of counterfactual images with in-image title injection in Section A.9
+- `original`: our identification dataset of original images in Section 4.1
+- `remove_background_q1q2`: our counting dataset of counterfactual images with their background being removed in Section 4.4
+- `remove_background_q3`: our identification dataset of counterfactual images with their background being removed in Section 4.4
+
+This is the fastest way to get started. Alternatively, you can also directly download the parquet files: 
 - Go to our [Hugging Face dataset](https://huggingface.co/datasets/anvo25/vlms-are-biased)
 - Download ready-to-use images with corresponding prompts
 
-This is the fastest way to get started.
 
 ### Option 2: Reproduce/Generate Dataset
 
