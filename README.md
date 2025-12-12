@@ -40,9 +40,28 @@ Use [these examples](./examples) where most tested models fail to answer.
 
 ---
 
+## 📰 Integration with `lmms-eval`
+VLMs are Biased benchmark is now officially supported by `lmms-eval`, one of the main open-source evaluation frameworks for VLMs! The community can now run the benchmark out-of-the-box across many VLMs.
+
+To run our benchmark on `lmms-eval` please follow these steps:
+1. Set up `lmms-eval` by following their installation guide [documentation](https://github.com/EvolvingLMMs-Lab/lmms-eval)
+2. Run the following command:
+```
+python -m lmms_eval \
+  --model qwen2_5_vl \
+  --model_args pretrained=Qwen/Qwen2.5-VL-3B-Instruct \
+  --tasks vlms_are_biased \
+  --batch_size 1 \
+  --device cuda:0
+```
+
+For more details, please visit their page: [lmms_eval/tasks/vlms_are_biased](https://github.com/EvolvingLMMs-Lab/lmms-eval/tree/main/lmms_eval/tasks/vlms_are_biased)
+
+**Note**: `lmms-eval` currently only support the `main` subset of VLMBias. To use other subsets, please refer to our **Quick Start Guide** below.
+
 ## 🚀 Quick Start Guide
 
-### Option 1: Use Pre-built Dataset (Recommended for testing your models)
+### Option 1: Use Pre-built Dataset (Recommended for testing your models on different subsets)
 
 **If you just want to use our dataset for evaluation or research:**
 
