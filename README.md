@@ -33,20 +33,27 @@
 
 *Large language models (LLMs) memorize a vast amount of prior knowledge from the Internet that help them on downstream tasks but also may notoriously sway their outputs towards wrong or biased answers. In this work, we test how the knowledge about popular subjects hurt the accuracy of vision language models (VLMs) on standard, objective visual tasks of counting and identification. We find that state-of-the-art VLMs are **strongly biased** (e.g., unable to recognize a fourth stripe has been added to a 3-stripe Adidas logo) scoring an average of 17.05% accuracy in counting (e.g., counting stripes in an Adidas-like logo) across 7 diverse domains from animals, logos, chess, boardgames, optical illusions, to patterned grids. Insert text (e.g., "Adidas") describing the subject name into the counterfactual image further decreases VLM accuracy. The biases in VLMs are so strong that instructing them to double-check their results or rely exclusively on image details to answer improves counting accuracy by only +2 points, on average. Our work presents an interesting failure mode in VLMs and an automated framework for testing VLM biases. Code and data are available at: [vlmsarebiased.github.io](https://vlmsarebiased.github.io)*
 
-
----
-## 👋 Trying out our images on your model
-Use [these examples](./examples) where most tested models fail to answer.
-
 ---
 
-## 📰 Integration with `lmms-eval`
-VLMs are Biased benchmark is now officially supported by `lmms-eval`, one of the main open-source evaluation frameworks for VLMs! The community can now run the benchmark out-of-the-box across many VLMs.
+## 2. Quick Start
 
-To run our benchmark on `lmms-eval` please follow these steps:
-1. Set up `lmms-eval` by following their installation guide [documentation](https://github.com/EvolvingLMMs-Lab/lmms-eval)
-2. Run the following command:
-```
+Get started with VLMBias in minutes—choose the option that fits your use case.
+
+### 2.1 Try Example Images
+
+Want to quickly test your model on challenging images? Use our pre-selected examples where most VLMs fail:
+
+👉 **[Download example images](./examples)**
+
+### 2.2 Run with lmms-eval (For Standardized Evaluation)
+
+VLMBias is officially integrated with [lmms-eval](https://github.com/EvolvingLMMs-Lab/lmms-eval), a popular evaluation framework.
+
+**Step 1:** Install lmms-eval following their [documentation](https://github.com/EvolvingLMMs-Lab/lmms-eval)
+
+**Step 2:** Run the benchmark:
+
+```bash
 python -m lmms_eval \
   --model qwen2_5_vl \
   --model_args pretrained=Qwen/Qwen2.5-VL-3B-Instruct \
@@ -55,73 +62,63 @@ python -m lmms_eval \
   --device cuda:0
 ```
 
-For more details, please visit their page: [lmms_eval/tasks/vlms_are_biased](https://github.com/EvolvingLMMs-Lab/lmms-eval/tree/main/lmms_eval/tasks/vlms_are_biased)
+For more details: [lmms_eval/tasks/vlms_are_biased](https://github.com/EvolvingLMMs-Lab/lmms-eval/tree/main/lmms_eval/tasks/vlms_are_biased)
 
-**Note**: `lmms-eval` currently only support the `main` subset of VLMBias. To use other subsets, please refer to our **Quick Start Guide** below.
+**Note:** lmms-eval currently only supports the `main` subset. For other subsets, use [Section 2.3](#23-use-the-pre-built-dataset-recommended).
 
-## 🚀 Quick Start Guide
+### 2.3 Use the Pre-built Dataset (For Thorough Evaluation)
 
-### Option 1: Use Pre-built Dataset (Recommended for testing your models on different subsets)
+Want to evaluate your model on the full benchmark, or to have more control over the evaluation process? Load our dataset directly from Hugging Face:
 
-**If you just want to use our dataset for evaluation or research:**
-
-📥 **Download the complete dataset from Hugging Face** with full images and prompts:
-
-Please run the following script:
-```
+```python
 import datasets
 dataset = datasets.load_dataset('anvo25/vlms-are-biased')
 ```
-This will return a DatasetDict with this structure:
-```
-DatasetDict({
-    main: Dataset({
-        features: ['image', 'ID', 'image_path', 'topic', 'sub_topic', 'prompt', 'ground_truth', 'expected_bias', 'with_title', 'type_of_question', 'pixel', 'metadata'],
-        num_rows: 2784
-    })
-    identification: Dataset({
-        features: ['image', 'ID', 'image_path', 'topic', 'sub_topic', 'prompt', 'ground_truth', 'expected_bias', 'with_title', 'type_of_question', 'pixel', 'metadata'],
-        num_rows: 1392
-    })
-    withtitle: Dataset({
-        features: ['image', 'ID', 'image_path', 'topic', 'sub_topic', 'prompt', 'ground_truth', 'expected_bias', 'with_title', 'type_of_question', 'pixel', 'metadata'],
-        num_rows: 2784
-    })
-    original: Dataset({
-        features: ['image', 'ID', 'image_path', 'topic', 'sub_topic', 'prompt', 'ground_truth', 'expected_bias', 'with_title', 'type_of_question', 'pixel', 'metadata'],
-        num_rows: 458
-    })
-    remove_background_q1q2: Dataset({
-        features: ['image', 'ID', 'image_path', 'topic', 'sub_topic', 'prompt', 'ground_truth', 'expected_bias', 'with_title', 'type_of_question', 'pixel', 'metadata'],
-        num_rows: 2784
-    })
-    remove_background_q3: Dataset({
-        features: ['image', 'ID', 'image_path', 'topic', 'sub_topic', 'prompt', 'ground_truth', 'expected_bias', 'with_title', 'type_of_question', 'pixel', 'metadata'],
-        num_rows: 1392
-    })
-})
-```
-- `main`: our counting dataset of counterfactual images used throughout the paper
-- `identification`: our identification dataset of counterfactual images in Section 4.3
-- `withtitle`: our counting dataset of counterfactual images with in-image title injection in Section A.9
-- `original`: our identification dataset of original images in Section 4.1
-- `remove_background_q1q2`: our counting dataset of counterfactual images with their background being removed in Section 4.4
-- `remove_background_q3`: our identification dataset of counterfactual images with their background being removed in Section 4.4
 
-This is the fastest way to get started. Alternatively, you can also directly download the parquet files: 
-- Go to our [Hugging Face dataset](https://huggingface.co/datasets/anvo25/vlms-are-biased)
-- Download ready-to-use images with corresponding prompts
+See [Section 3](#3-dataset-details) for details on available subsets.
 
-
-### Option 2: Reproduce/Generate Dataset
-
-**If you want to reproduce our dataset generation process or create custom variations:**
-
-Please follow the installation and generation steps below to run the code locally.
 
 ---
 
-## 💻 Getting Started
+## 3. Dataset Details
+
+### 3.1 Dataset Structure
+
+Loading the dataset returns a `DatasetDict` with multiple subsets:
+
+```python
+DatasetDict({
+    main: Dataset({...num_rows: 2784}),
+    identification: Dataset({...num_rows: 1392}),
+    withtitle: Dataset({...num_rows: 2784}),
+    original: Dataset({...num_rows: 458}),
+    remove_background_q1q2: Dataset({...num_rows: 2784}),
+    remove_background_q3: Dataset({...num_rows: 1392}),
+})
+```
+
+### 3.2 Subset Descriptions
+
+| Subset | Description | Paper Section |
+|--------|-------------|---------------|
+| `main` | Counting dataset of counterfactual images | Throughout paper |
+| `identification` | Identification dataset of counterfactual images | Section 4.3 |
+| `withtitle` | Counting dataset with in-image title injection | Section A.9 |
+| `original` | Identification dataset of original (unmodified) images | Section 4.1 |
+| `remove_background_q1q2` | Counting dataset with background removed | Section 4.4 |
+| `remove_background_q3` | Identification dataset with background removed | Section 4.4 |
+
+### 3.3 Data Fields
+
+Each sample contains: `image`, `ID`, `image_path`, `topic`, `sub_topic`, `prompt`, `ground_truth`, `expected_bias`, `with_title`, `type_of_question`, `pixel`, `metadata`
+
+---
+
+## 4. Generate Your Own Dataset
+
+**Goal:** Reproduce our dataset or create custom variations. Skip this section if you only need the pre-built dataset.
+
+### 4.1 Installation
 
 ```bash
 git clone https://github.com/anvo25/vlms-are-biased.git
@@ -129,7 +126,17 @@ cd vlms-are-biased
 pip install -r requirements.txt
 ```
 
-## 📊 Tasks
+### 4.2 Generate All Datasets
+
+```bash
+# Step 1: Generate images without titles
+python main.py --all
+
+# Step 2: Add in-image titles
+python add_titles.py --topic all
+```
+
+### 4.3 Generate Specific Tasks
 
 To run the code to generate the **counterfactual** images for a specific task, go to the following embedded links:
 - **Chess Pieces**: [Chess pieces](generators/chess_pieces_generator.py), [Xiangqi pieces](generators/xiangqi_board_generator.py) (modified starting positions)
@@ -149,51 +156,34 @@ To run the code to generate the **counterfactual** images for a specific task, g
 
 *All images are generated at 384px, 768px, and 1152px resolutions.*
 
-### Quickstart
-Generate all available datasets:
+### 4.4 Adding Titles to Generated Images
+
+After generating images, add in-image titles:
+
 ```bash
-python main.py --all
-python add_titles.py --topic all
+python add_titles.py --topic chess_pieces  # or: all, logos, flags, etc.
 ```
 
-If you only want to generate data of a specific task, you can run the corresponding file instead. Here are some examples:
-
-Generate specific optical illusions:
-```bash
-python main.py --optical_illusions --illusion_type Ebbinghaus
-```
-
-Generate chess pieces dataset with modified starting positions:
-```bash
-# Step 1: Generate "notitle" images
-python main.py --chess_pieces
-
-# Step 2: Add titles to create "in_image_title" versions  
-python add_titles.py --topic chess_pieces
-```
-
-
-
-   
 ---
 
-## 📂 Structure
+## 5. Project Structure
 
 ```
 vlms-are-biased/
-├── main.py                        # Generate "notitle" datasets
-├── add_titles.py                  # Add "in_image_title" versions
-├── generators/                    # Individual dataset generators
+├── main.py                          # Generate "notitle" datasets
+├── add_titles.py                    # Add "in_image_title" versions
+├── generators/                      # Individual dataset generators
 │   ├── chess_pieces_generator.py
 │   ├── optical_illusion_generator.py
 │   └── ...
-├── vlms-are-biased-notitle/       # Output: images without titles
-└── vlms-are-biased-in_image_title/ # Output: images with titles
+├── examples/                        # Example images for quick testing
+├── vlms-are-biased-notitle/         # Output: images without titles
+└── vlms-are-biased-in_image_title/  # Output: images with titles
 ```
 
 ---
 
-## 📖 Citation
+## 6. Citation
 
 ```bibtex
 @misc{vlmsarebiased,
@@ -206,3 +196,5 @@ vlms-are-biased/
       url={https://arxiv.org/abs/2505.23941}, 
 }
 ```
+
+
