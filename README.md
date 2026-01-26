@@ -15,6 +15,8 @@
     <sup>1</sup>KAIST, <sup>2</sup>College of William and Mary, <sup>3</sup>University of Alberta, <sup>4</sup>Auburn University
   </p>
 
+  <h3>The Fourteenth International Conference on Learning Representations (ICLR 2026)</h3>
+
 [![Project Page](https://img.shields.io/badge/Project_Page-vlmsarebiased.github.io-blue.svg)](https://vlmsarebiased.github.io)
 [![arXiv](https://img.shields.io/badge/arXiv-2505.23941-b31b1b.svg)](https://arxiv.org/abs/2505.23941)
 [![Hugging Face](https://img.shields.io/badge/🤗%20Hugging%20Face-Dataset-yellow.svg)](https://huggingface.co/datasets/anvo25/vlms-are-biased)
@@ -186,14 +188,12 @@ vlms-are-biased/
 ## 6. Citation
 
 ```bibtex
-@misc{vlmsarebiased,
-      title={Vision Language Models are Biased}, 
+@inproceedings{vlmsarebiased,
+      title={Vision Language Models are Biased},
       author={An Vo and Khai-Nguyen Nguyen and Mohammad Reza Taesiri and Vy Tuong Dang and Anh Totti Nguyen and Daeyoung Kim},
-      year={2025},
-      eprint={2505.23941},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2505.23941}, 
+      booktitle={The Fourteenth International Conference on Learning Representations (ICLR)},
+      year={2026},
+      url={https://arxiv.org/abs/2505.23941},
 }
 ```
 
