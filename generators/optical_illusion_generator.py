@@ -8,12 +8,13 @@ import json
 import random
 import logging 
 import shutil
+from PIL import Image, ImageDraw, ImageOps
 import pandas as pd
 import argparse 
 from tqdm import tqdm
 
 try:
-    from Pyllusion import pyllusion
+    import pyllusion  # pip install pyllusion
     HAS_PYLLUSION = True
 except ImportError:
     HAS_PYLLUSION = False
@@ -68,53 +69,125 @@ def define_illusion_parameters_config():
         "Ebbinghaus": {
             "diff_nonzero": {"strengths": [3, 5], "diffs": [0.5, 0.6, 0.7], "with_negative": True},
             "diff_zero": {"strengths": [3, 4, 5, 6, 7, 8], "diffs": [0], "with_negative": True},
-            "questions": {"Q1": "Are the two inner circles equal in size? Answer in curly brackets, e.g., {Yes} or {No}.",
-                          "Q2": "Do the two inner circles have the same size? Answer in curly brackets, e.g., {Yes} or {No}.",
+            "questions": {"Q1": "Are the two red circles equal in size? Answer in curly brackets, e.g., {Yes} or {No}.",
+                          "Q2": "Do the two red circles have the same size? Answer in curly brackets, e.g., {Yes} or {No}.",
                           "Q3": "Is this an example of the Ebbinghaus illusion? Answer in curly brackets, e.g., {Yes} or {No}."},
             "topic_display_name": "Ebbinghaus Illusion", "pyllusion_class": pyllusion.Ebbinghaus
         },
         "MullerLyer": {
             "diff_nonzero": {"strengths": [30, 50], "diffs": [0.3, 0.4, 0.5], "with_negative": True},
             "diff_zero": {"strengths": [30, 35, 40, 45, 50, 55], "diffs": [0], "with_negative": True},
-            "questions": {"Q1": "Are the two horizontal lines equal in length? Answer in curly brackets, e.g., {Yes} or {No}.",
-                          "Q2": "Do the two horizontal lines have the same length? Answer in curly brackets, e.g., {Yes} or {No}.",
+            "questions": {"Q1": "Are the two red lines equal in length? Answer in curly brackets, e.g., {Yes} or {No}.",
+                          "Q2": "Do the two red lines have the same length? Answer in curly brackets, e.g., {Yes} or {No}.",
                           "Q3": "Is this an example of the Müller-Lyer illusion? Answer in curly brackets, e.g., {Yes} or {No}."},
             "topic_display_name": "Müller-Lyer Illusion", "pyllusion_class": pyllusion.MullerLyer
         },
         "Ponzo": {
             "diff_nonzero": {"strengths": [15, 18], "diffs": [0.15, 0.20, 0.25], "with_negative": True},
             "diff_zero": {"strengths": [15, 17, 19, 21, 23, 25], "diffs": [0], "with_negative": True},
-            "questions": {"Q1": "Are the two horizontal lines equal in length? Answer in curly brackets, e.g., {Yes} or {No}.",
-                          "Q2": "Do the two horizontal lines have the same length? Answer in curly brackets, e.g., {Yes} or {No}.",
+            "questions": {"Q1": "Are the two red lines equal in length? Answer in curly brackets, e.g., {Yes} or {No}.",
+                          "Q2": "Do the two red lines have the same length? Answer in curly brackets, e.g., {Yes} or {No}.",
                           "Q3": "Is this an example of the Ponzo illusion? Answer in curly brackets, e.g., {Yes} or {No}."},
             "topic_display_name": "Ponzo Illusion", "pyllusion_class": pyllusion.Ponzo
         },
         "VerticalHorizontal": { # Renamed for consistency as topic ID
             "diff_nonzero": {"size_mins": [0.5, 1.0], "diffs": [0.3, 0.4, 0.5], "with_negative": False},
             "diff_zero": {"size_mins": [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "diffs": [0], "with_negative": False},
-            "questions": {"Q1": "Are the horizontal and vertical lines equal in length? Answer in curly brackets, e.g., {Yes} or {No}.",
-                          "Q2": "Do the horizontal and vertical lines have the same length? Answer in curly brackets, e.g., {Yes} or {No}.",
+            "questions": {"Q1": "Are the two red lines equal in length? Answer in curly brackets, e.g., {Yes} or {No}.",
+                          "Q2": "Do the two red lines have the same length? Answer in curly brackets, e.g., {Yes} or {No}.",
                           "Q3": "Is this an example of the Vertical-Horizontal illusion? Answer in curly brackets, e.g., {Yes} or {No}."},
             "topic_display_name": "Vertical-Horizontal Illusion", "pyllusion_class": pyllusion.VerticalHorizontal
         },
         "Zollner": { # Renamed for consistency as topic ID
             "diff_nonzero": {"strengths": [60, 75], "diffs": [2, 2.5, 3], "with_negative": True},
             "diff_zero": {"strengths": [50, 55, 60, 65, 70, 75], "diffs": [0], "with_negative": True},
-            "questions": {"Q1": "Are the main diagonal lines parallel? Answer in curly brackets, e.g., {Yes} or {No}.",
-                          "Q2": "Do the main diagonal lines run parallel to each other? Answer in curly brackets, e.g., {Yes} or {No}.",
+            "questions": {"Q1": "Are the two red lines parallel? Answer in curly brackets, e.g., {Yes} or {No}.",
+                          "Q2": "Do the two red lines run parallel? Answer in curly brackets, e.g., {Yes} or {No}.",
                           "Q3": "Is this an example of the Zöllner illusion? Answer in curly brackets, e.g., {Yes} or {No}."},
             "topic_display_name": "Zöllner Illusion", "pyllusion_class": pyllusion.Zollner # Corrected class name
         },
         "Poggendorff": {
              "diff_nonzero": {"strengths": [40, 45, 50], "diffs": [0.1, 0.2], "with_negative": True},
              "diff_zero": {"strengths": [30, 35, 40, 45, 50, 55], "diffs": [0], "with_negative": True},
-             "questions": {"Q1": "Are the two diagonal line segments collinear (would they form a straight line if extended)? Answer in curly brackets, e.g., {Yes} or {No}.",
-                           "Q2": "Do the two diagonal line segments appear to be part of the same continuous straight line? Answer in curly brackets, e.g., {Yes} or {No}.",
+             "questions": {"Q1": "Are the two red line segments aligned? Answer in curly brackets, e.g., {Yes} or {No}.",
+                           "Q2": "Do the two red line segments form a straight line? Answer in curly brackets, e.g., {Yes} or {No}.",
                            "Q3": "Is this an example of the Poggendorff illusion? Answer in curly brackets, e.g., {Yes} or {No}."},
             "topic_display_name": "Poggendorff Illusion", "pyllusion_class": pyllusion.Poggendorff
         }
     }
     return illusion_params_config
+
+# Every illusion is drawn once at REF_PX and downscaled to the smaller resolutions, so all
+# resolutions show the same picture. The image height is always the resolution (384/768/1152);
+# only Ebbinghaus is wider than tall.
+REF_PX = max(RESOLUTIONS)
+# Pyllusion draws lines with a fixed pixel width, which looks right at 384 px but too thin at
+# larger sizes. Scale it with the canvas so lines keep the same relative thickness.
+LINE_SCALE = REF_PX / 384
+# Line width of the Vertical-Horizontal illusion, relative to image height (matches the others).
+VH_LINE_WIDTH = 7 / 384
+
+
+def _patch_pyllusion_line_width():
+    """Make Pyllusion's line-drawing helper scale `size` by LINE_SCALE (illusions with lines)."""
+    import importlib
+    from pyllusion.image import image_line
+
+    def scaled_image_line(*args, size=1, **kwargs):
+        return image_line(*args, size=max(1, round(size * LINE_SCALE)), **kwargs)
+
+    for module in ("MullerLyer.mullerlyer_image", "Ponzo.ponzo_image",
+                   "Zollner.zollner_image", "Poggendorff.poggendorff_image"):
+        importlib.import_module(f"pyllusion.{module}").image_line = scaled_image_line
+
+
+if HAS_PYLLUSION:
+    _patch_pyllusion_line_width()
+
+
+def draw_vertical_horizontal(size_min, difference, px):
+    """Inverted-T Vertical-Horizontal illusion: a red vertical line standing on the middle of a
+    red horizontal line. Lengths follow Pyllusion's convention (1 = half the image width):
+    the shorter line is `size_min` long and the other is (1 + |difference|) times longer;
+    a positive difference makes the horizontal line longer, a negative one the vertical line."""
+    scale = 2  # draw at 2x and downscale, for antialiasing
+    canvas = px * scale
+    unit = canvas / 2
+    horizontal = size_min * (1 + max(difference, 0)) * unit
+    vertical = size_min * (1 + max(-difference, 0)) * unit
+    width = max(1, round(VH_LINE_WIDTH * canvas))
+    img = Image.new("RGB", (canvas, canvas), "white")
+    draw = ImageDraw.Draw(img)
+    cx, top = canvas / 2, (canvas - vertical) / 2
+    base = top + vertical
+    draw.line([(cx - horizontal / 2, base), (cx + horizontal / 2, base)], fill="red", width=width)
+    draw.line([(cx, top), (cx, base)], fill="red", width=width)
+    return img.resize((px, px), Image.Resampling.LANCZOS)
+
+
+def render_illusion_reference(illusion_type, PyllusionClass, params):
+    """Render one illusion at REF_PX height. Ebbinghaus is drawn on a 2:1 canvas (a square one
+    cuts off the outer circles) and trimmed to its content, as in the published dataset."""
+    if illusion_type == "VerticalHorizontal":
+        return draw_vertical_horizontal(params["size_min"], params["difference"], REF_PX)
+    instance = PyllusionClass(illusion_strength=params["illusion_strength"], difference=params["difference"])
+    if illusion_type != "Ebbinghaus":
+        return instance.to_image(width=REF_PX, height=REF_PX).convert("RGB")
+    img = instance.to_image(width=2 * REF_PX, height=REF_PX).convert("RGB")
+    bbox = ImageOps.invert(img).getbbox()  # bounding box of non-white pixels
+    if bbox is None:
+        return img
+    margin = int(0.02 * REF_PX)
+    return img.crop((max(bbox[0] - margin, 0), 0, min(bbox[2] + margin, img.width), REF_PX))
+
+
+def resize_to_height(img, height):
+    """Downscale so the image is `height` pixels tall, keeping the aspect ratio."""
+    if img.height == height:
+        return img
+    width = round(img.width * height / img.height)
+    return img.resize((width, height), Image.Resampling.LANCZOS)
+
 
 def _generate_parameter_combinations_for_illusion(illusion_config):
     """Generates all parameter combinations for a single illusion type based on its config."""
@@ -195,17 +268,12 @@ def _generate_illusion_images_and_metadata(
             pyllusion_call_params["illusion_strength"] = combo_params['strength_param']
             metadata_params_to_store["strength"] = combo_params['strength_param']
         
+        # Draw once at the largest resolution; smaller ones are downscaled copies
+        reference_img = render_illusion_reference(illusion_name_key, PyllusionClass, pyllusion_call_params)
+
         # Loop through resolutions for this parameter combination
         for res_px in RESOLUTIONS:
             try:
-                # Instantiate Pyllusion object with current parameters
-                # Note: VerticalHorizontal takes 'difference' and 'size_min'. Others take 'illusion_strength' and 'difference'.
-                if illusion_name_key == "VerticalHorizontal":
-                    illusion_instance = PyllusionClass(difference=pyllusion_call_params["difference"], 
-                                                       size_min=pyllusion_call_params["size_min"])
-                else:
-                    illusion_instance = PyllusionClass(illusion_strength=pyllusion_call_params["illusion_strength"], 
-                                                       difference=pyllusion_call_params["difference"])
 
                 # --- Generate "notitle" image ---
                 # Filename: <IllusionType>_<sample_id>_<param_str>_notitle_px<resolution>.png
@@ -215,8 +283,7 @@ def _generate_illusion_images_and_metadata(
                 # Final path in the "notitle" structure
                 final_img_path = os.path.join(output_dirs_for_illusion["img_dir"], notitle_img_basename)
 
-                # Save image using Pyllusion, specifying width and height for resolution
-                illusion_instance.to_image(save_path=temp_img_path, width=res_px, height=res_px)
+                resize_to_height(reference_img, res_px).save(temp_img_path)
                 
                 # Copy from temp to final location (or move if preferred)
                 shutil.copy2(temp_img_path, final_img_path)
@@ -254,10 +321,9 @@ def _generate_illusion_images_and_metadata(
                             **metadata_params_to_store # Unpack strength/size_min and difference_value
                         }
                     })
-            except Exception as e:
-                logging.error(f"Error generating {illusion_name_key} (res {res_px}, combo {combo_params}): {e}", exc_info=True)
-                progress_bar.update(1) # Update for the attempted image even if it failed
-                continue # Skip to next resolution or combination
+            except Exception:
+                logging.error(f"Error generating {illusion_name_key} (res {res_px}, combo {combo_params})")
+                raise  # stop instead of silently writing an incomplete dataset
 
         unique_sample_id_counter += 1 # Increment after all resolutions for a param combination
 

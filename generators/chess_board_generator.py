@@ -21,11 +21,16 @@ class ChessBoard:
     def __init__(self, rows=STANDARD_BOARD_ROWS, cols=STANDARD_BOARD_COLS):
         self.rows = max(1, rows)
         self.cols = max(1, cols)
+        # Rows/columns added (+) or removed (-) at the top/left. Square colors stay attached to
+        # the original squares, so changing the first row looks different from changing the last.
+        self.row_offset = 0
+        self.col_offset = 0
 
     def add_row(self, position="last"):
         """Adds a row to the board. 'position' can be 'first' or 'last'."""
         insert_idx = 0 if position == "first" else self.rows # Insert at top or bottom
         self.rows += 1
+        if position == "first": self.row_offset += 1
         return {"action": "add_row", "dimension": "row", "position_added": position, "insert_index": insert_idx}
 
     def remove_row(self, position="last"):
@@ -34,6 +39,7 @@ class ChessBoard:
         remove_idx = 0 if position == "first" else self.rows - 1
         # If pieces were managed, pieces on this row would be removed, others adjusted.
         self.rows -= 1
+        if position == "first": self.row_offset -= 1
         return {"action": "remove_row", "dimension": "row", "position_removed": position, "remove_index": remove_idx}
 
     def add_column(self, position="last"):
@@ -41,6 +47,7 @@ class ChessBoard:
         insert_idx = 0 if position == "first" else self.cols
         # If pieces were managed, their files would need adjustment.
         self.cols += 1
+        if position == "first": self.col_offset += 1
         return {"action": "add_column", "dimension": "col", "position_added": position, "insert_index": insert_idx}
 
     def remove_column(self, position="last"):
@@ -49,6 +56,7 @@ class ChessBoard:
         remove_idx = 0 if position == "first" else self.cols - 1
         # If pieces were managed, pieces on this col would be removed, others adjusted.
         self.cols -= 1
+        if position == "first": self.col_offset -= 1
         return {"action": "remove_column", "dimension": "col", "position_removed": position, "remove_index": remove_idx}
 
 # --- Drawing Function for Chess Board SVG ---
@@ -86,10 +94,12 @@ def draw_chess_board_svg(board_obj, render_size=800, show_coords=False):
             square_x = grid_origin_x + c_idx * actual_square_size
             square_y = grid_origin_y + r_idx * actual_square_size
             
-            current_color = color_light if (r_idx + c_idx) % 2 == 0 else color_dark
+            # Color of the original square: the top-left square of the standard board is light
+            parity = (r_idx - board_obj.row_offset + c_idx - board_obj.col_offset) % 2
+            current_color = color_light if parity == 0 else color_dark
             
             dwg.add(dwg.rect(insert=(square_x, square_y), size=(actual_square_size, actual_square_size),
-                             fill=current_color, stroke=grid_utils.sanitize_filename("none"))) # No stroke for individual squares usually
+                             fill=current_color, stroke="none")) # No stroke for individual squares usually
 
     dwg.add(dwg.rect(insert=(grid_origin_x, grid_origin_y), size=(board_pixel_width, board_pixel_height),
                      fill="none", stroke="#333333", stroke_width=max(1, render_size/400.0)))
@@ -129,8 +139,8 @@ def create_chess_board_dataset(quality_scale=5.0, svg_size=800):
         "Count the rows on this board. Answer with a number in curly brackets, e.g., {9}."
     ]
     col_prompts_q1q2 = [
-        "How many columns are there on this board? Answer with a number in curly brackets, e.g., {{9}.",
-        "Count the columns on this board. Answer with a number in curly brackets, e.g., {{9}}."
+        "How many columns are there on this board? Answer with a number in curly brackets, e.g., {9}.",
+        "Count the columns on this board. Answer with a number in curly brackets, e.g., {9}."
     ]
     std_check_prompt_q3 = f"Is this a {STANDARD_BOARD_ROWS}x{STANDARD_BOARD_COLS} {BOARD_TYPE_NAME}? Answer in curly brackets, e.g., {{Yes}} or {{No}}."
     std_check_gt_q3 = "No"  # Since all are variations from standard

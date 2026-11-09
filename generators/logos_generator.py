@@ -49,25 +49,29 @@ CAR_DATA = {
     'Toyota': {
         "colors": ["White", "Gray", "Black"],
         "body_types": ["SUV", "Sedan", "Pickup Truck", "Hatchback", "Minivan"],
-        "logo_elements": 3,  # Toyota has 3 ellipses
+        "logo_elements": 3,  # Toyota has 3 ellipses (not used in the paper)
+        "bias_elements": 3,
         "logo_element_name": "ellipses"
     },
     "Maserati": {
         "colors": ["White", "Gray", "Black"],
         "body_types": ["Sedan", "SUV", "Coupe", "Convertible", "Sports Car"],
-        "logo_elements": 5,  # 5 prongs
+        "logo_elements": 5,  # modified: 5 prongs
+        "bias_elements": 3,  # real Maserati trident: 3 prongs
         "logo_element_name": "prongs"
     },
     "Mercedes-Benz": {
         "colors": ["White", "Gray", "Black"],
         "body_types": ["Sedan", "SUV", "Hatchback", "Coupe", "Convertible"],
-        "logo_elements": 5,  # 5 points on the star
+        "logo_elements": 4,  # modified: 4-pointed star
+        "bias_elements": 3,  # real Mercedes-Benz star: 3 points
         "logo_element_name": "points on the star"
     },
     "Audi": {
         "colors": ["White", "Gray", "Black"],  # Limited as in notebook
         "body_types": ["Sedan", "SUV", "Hatchback", "Coupe", "Convertible"],
-        "logo_elements": 5,  # 5 overlapping circles
+        "logo_elements": 5,  # modified: 5 overlapping circles
+        "bias_elements": 4,  # real Audi logo: 4 rings
         "logo_element_name": "overlapping circles"
     }
 }
@@ -281,7 +285,7 @@ def generate_car_logos_dataset(num_trials=1):
     print("NEXT STEPS:")
     print("1. Create modified logo versions:")
     print("   - Maserati: Modify to different number of prongs (currently expects 5)")
-    print("   - Mercedes-Benz: Modify star points (currently expects 5)")  
+    print("   - Mercedes-Benz: Modify star points (currently expects 4)")  
     print("   - Audi: Modify overlapping circles (currently expects 5)")
     print("   - BMW: Modify quadrants (currently expects 4)")
     print("   - Toyota: Modify ellipses (currently expects 3)")
@@ -413,7 +417,7 @@ def create_car_metadata_entries(metadata_list, brand, color, body_type, trial, r
     
     # Ground truth values
     gt_elements = str(expected_elements)
-    bias_elements = str(expected_elements)  # Could be modified if using altered logos
+    bias_elements = str(car_info["bias_elements"])  # count on the real, unmodified logo
     
     gt_brand = "Yes"
     bias_brand = "Yes"
@@ -425,6 +429,7 @@ def create_car_metadata_entries(metadata_list, brand, color, body_type, trial, r
     # Create entries for Q1 and Q2 (logo element counting)
     for q_key, prompt in [("Q1", q1_prompt), ("Q2", q2_prompt)]:
         metadata_list.append({
+            "ID": f"{base_id}_{q_key}",
             "image": filename,
             "image_path": image_path_relative,
             "topic": "Logos",
@@ -438,6 +443,7 @@ def create_car_metadata_entries(metadata_list, brand, color, body_type, trial, r
     
     # Create entry for Q3 (brand identification)
     metadata_list.append({
+        "ID": f"{base_id}_Q3",
         "image": filename,
         "image_path": image_path_relative,
         "topic": "Logos",
@@ -457,27 +463,31 @@ def create_shoe_metadata_entries(metadata_list, img_data, resolution, filename):
     # Define brand-specific prompts
     if brand == 'adidas':
         expected_elements = 4  # 4 stripes
+        original_elements = 3  # real Adidas logo: 3 stripes
         q1_prompt = "How many visible stripes are there in the logo of the left shoe? Answer with a number in curly brackets, e.g., {9}."
         q2_prompt = "Count the visible stripes in the logo of the left shoe. Answer with a number in curly brackets, e.g., {9}."
         q3_prompt = "Are the logos on these shoes Adidas logos? Answer in curly brackets, e.g., {Yes} or {No}."
     elif brand == 'nike':
         expected_elements = 2  # 2 swooshes (assuming both shoes visible)
+        original_elements = 1  # real Nike logo: 1 swoosh
         q1_prompt = "How many visible colored stylized curves are there in the logo of the left shoe? Answer with a number in curly brackets, e.g., {9}"
         q2_prompt = "Count the visible colored stylized curves in the logo of the left shoe. Answer with a number in curly brackets, e.g., {9}"
         q3_prompt = "Are the logos on these shoes Nike logos? Answer in curly brackets, e.g., {Yes} or {No}."
     
     # Ground truth values
     gt_elements = str(expected_elements)
-    bias_elements = str(expected_elements)
+    bias_elements = str(original_elements)
     
     gt_brand = "Yes"
     bias_brand = "Yes"
     
     image_path_relative = os.path.join("images", filename).replace("\\", "/")
+    base_id = f"{os.path.splitext(filename)[0]}_px{resolution}"
     
     # Create entries for Q1 and Q2 (logo element counting)
     for q_key, prompt in [("Q1", q1_prompt), ("Q2", q2_prompt)]:
         metadata_list.append({
+            "ID": f"{base_id}_{q_key}",
             "image": filename,
             "image_path": image_path_relative,
             "topic": "Logos",
@@ -491,6 +501,7 @@ def create_shoe_metadata_entries(metadata_list, img_data, resolution, filename):
     
     # Create entry for Q3 (brand identification)
     metadata_list.append({
+        "ID": f"{base_id}_Q3",
         "image": filename,
         "image_path": image_path_relative,
         "topic": "Logos",
@@ -509,7 +520,7 @@ def main():
                         help='Type of logo dataset to generate: cars or shoes')
     parser.add_argument('--trials', type=int, default=1, 
                         help='Number of trials per item (default: 1 for cars, 6 for shoes)')
-    parser.add_argument('--base-shoes-dir', type=str, default="shoes_dir/",
+    parser.add_argument('--base-shoes-dir', type=str, default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "shoes_dir"),
                         help='Directory containing base shoe images (for shoes type only)')
     
     args = parser.parse_args()

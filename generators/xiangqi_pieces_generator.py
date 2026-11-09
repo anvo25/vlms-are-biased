@@ -317,8 +317,8 @@ def generate_single_xiangqi_notitle_image_and_meta(
                                   if piece_symbol_on_board.lower() == new_piece_sym_if_replace.lower())
         ground_truth_q1_q2 = str(count_of_added_type)
         prompts_q1_q2 = [
-            "How many {piece_added_type_for_prompt} pieces are there on this board? Answer with a number in curly brackets, e.g., {9}.",
-            "Count the {piece_added_type_for_prompt} pieces on this board. Answer with a number in curly brackets, e.g., {9}."
+            f"How many {piece_added_type_for_prompt} pieces are there on this board? Answer with a number in curly brackets, e.g., {{9}}.",
+            f"Count the {piece_added_type_for_prompt} pieces on this board. Answer with a number in curly brackets, e.g., {{9}}."
         ]
         expected_bias_q1_q2 = str(standard_xiangqi_type_counts.get(piece_added_type_for_prompt, "0"))
 

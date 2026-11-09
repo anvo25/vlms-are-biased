@@ -1,4 +1,13 @@
-__pycache__
-vlms-are-biased-in_image_title
-vlms-are-biased-notitle
-.gitmodules
+__pycache__/
+*.pyc
+
+# generated datasets and scratch output
+vlms-are-biased-in_image_title/
+vlms-are-biased-notitle/
+titles/
+temp_*/
+results/
+
+# secrets
+api_key/
+*.env

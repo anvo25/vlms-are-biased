@@ -2,7 +2,6 @@ import os
 import argparse
 import time
 import sys
-import importlib
 
 
 project_root = os.path.dirname(os.path.abspath(__file__))
@@ -20,17 +19,9 @@ from generators import sudoku_board_generator
 from generators import patterned_grid_generator
 from generators import optical_illusion_generator
 
-try:
-    pyllusion_spec = importlib.util.find_spec("Pyllusion")
-    if pyllusion_spec is None:
-        pyllusion_spec = importlib.util.find_spec("Pyllusion.pyllusion")
-    HAS_PYLLUSION = pyllusion_spec is not None
-except ImportError:
-    HAS_PYLLUSION = False
-
+HAS_PYLLUSION = optical_illusion_generator.HAS_PYLLUSION
 if not HAS_PYLLUSION:
-    print("Warning: Pyllusion package not found within the 'generators' directory or system paths.")
-    print("Optical illusion generation will be skipped if selected.")
+    print("Warning: pyllusion is not installed (pip install pyllusion); optical illusions will be skipped.")
 
 
 def setup_initial_dirs():
@@ -39,7 +30,7 @@ def setup_initial_dirs():
     os.makedirs("titles", exist_ok=True)
 
 def main():
-    parser = argparse.ArgumentParser(description='ViasTest "notitle" Dataset Generator')
+    parser = argparse.ArgumentParser(description='VLMBias "notitle" Dataset Generator')
     parser.add_argument('--all', action='store_true', help='Generate all available datasets.')
     
     parser.add_argument('--chess_pieces', action='store_true', help='Generate Chess Pieces dataset.')
@@ -179,8 +170,7 @@ def main():
             except Exception as e:
                 print_task_error("optical illusions", e)
         else:
-            print("ERROR: Pyllusion library not found or not accessible. Cannot generate optical illusions.")
-            print("Ensure Pyllusion is correctly placed in 'generators/Pyllusion/' and the directory has an __init__.py if it's a package.")
+            print("ERROR: pyllusion is not installed. Run: pip install pyllusion")
     
     end_time = time.time()
     duration = end_time - start_time

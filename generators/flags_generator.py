@@ -3,6 +3,7 @@
 Flag Dataset Generator - Generates "notitle" images with flag stripe counting tasks
 Uses WikimediaSVGRetriever to download flag SVGs and LLM to modify stripe counts.
 """
+import ast
 import os
 import json
 import time
@@ -231,7 +232,7 @@ Do not return anything else.
         titles = [title for title, _ in svg_candidates]
         try:
             irrelevant_idx = self.filter_with_llm(search_term, titles)
-            filtered_indices = eval(irrelevant_idx)
+            filtered_indices = ast.literal_eval(irrelevant_idx)
             titles = [titles[i] for i in filtered_indices]
             svg_candidates = [svg_candidates[i] for i in filtered_indices]
         except:
@@ -247,7 +248,7 @@ Do not return anything else.
             candidates = [t.replace('File:', '').replace('.svg', '').strip().lower() for t in titles]
             try:
                 top_title_idx = self.rerank_with_llm(search_term, candidates)
-                sorted_candidates = [svg_candidates[i] for i in eval(top_title_idx)]
+                sorted_candidates = [svg_candidates[i] for i in ast.literal_eval(top_title_idx)]
             except:
                 sorted_candidates = svg_candidates
         elif self.model:

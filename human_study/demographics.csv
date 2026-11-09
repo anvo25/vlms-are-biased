@@ -1,0 +1,15 @@
+field,category,count
+gender,Man,41
+gender,Woman,36
+gender,Non-binary / Third gender,1
+age_group,18–24,48
+age_group,25–34,29
+age_group,35–44,1
+education,Bachelor's degree,43
+education,Master's degree,15
+education,"Some college / university, no degree",9
+education,Doctorate / PhD / professional degree,6
+education,Associate degree / diploma,2
+education,No formal education,1
+education,Prefer not to say,1
+education,Secondary education (high school or equivalent),1

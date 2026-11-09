@@ -26,34 +26,55 @@
 
 ---
 
-## 📌 Abstract
+## Abstract
 
 <p align="center">
-  <!-- Insert key figure from your paper here -->
-  <img src="./figures/overview.png" alt="VLMBias Overview" width="80%"/>
+  <img src="./figures/overview.png" alt="VLMBias overview" width="80%"/>
 </p>
 
-*Large language models (LLMs) memorize a vast amount of prior knowledge from the Internet that help them on downstream tasks but also may notoriously sway their outputs towards wrong or biased answers. In this work, we test how the knowledge about popular subjects hurt the accuracy of vision language models (VLMs) on standard, objective visual tasks of counting and identification. We find that state-of-the-art VLMs are **strongly biased** (e.g., unable to recognize a fourth stripe has been added to a 3-stripe Adidas logo) scoring an average of 17.05% accuracy in counting (e.g., counting stripes in an Adidas-like logo) across 7 diverse domains from animals, logos, chess, boardgames, optical illusions, to patterned grids. Insert text (e.g., "Adidas") describing the subject name into the counterfactual image further decreases VLM accuracy. The biases in VLMs are so strong that instructing them to double-check their results or rely exclusively on image details to answer improves counting accuracy by only +2 points, on average. Our work presents an interesting failure mode in VLMs and an automated framework for testing VLM biases. Code and data are available at: [vlmsarebiased.github.io](https://vlmsarebiased.github.io)*
+*Large language models (LLMs) memorize a vast amount of prior knowledge from the Internet that helps them on downstream tasks but also may notoriously sway their outputs toward wrong or biased answers. In this work, we test how the knowledge of popular subjects hurts the accuracy of vision language models (VLMs) on standard, objective visual tasks of counting and identification. We find that state-of-the-art VLMs are **strongly biased** (e.g., unable to recognize that a 4th stripe has been added to a 3-stripe Adidas logo), scoring an average of 17.05% accuracy in counting (e.g., counting stripes in an Adidas-like logo) across 7 diverse domains spanning animals, logos, chess, game boards, optical illusions, and patterned grids. Removing image backgrounds nearly doubles accuracy (by 21.09 points), revealing that background visual cues trigger these biased responses. Further analysis of VLMs' reasoning patterns shows that counting accuracy initially rises with thinking tokens, reaching ~40%, before declining with model overthinking. Our work presents an interesting failure mode in VLMs and a human-supervised automated framework for testing VLM biases.*
 
 ---
 
-## 2. Quick Start
+## What is in this repository
 
-Get started with VLMBias in minutes—choose the option that fits your use case.
+| Folder / file | Contents |
+|---|---|
+| [`examples/`](./examples) | A few images per task on which most VLMs fail; quick to try by hand |
+| [`evaluation/`](./evaluation) | Run an API model (OpenAI, Anthropic, Gemini) on the benchmark and score it |
+| [`human_study/`](./human_study) | De-identified data of the human study (78 participants) and a script that reproduces its table |
+| [`main.py`](./main.py), [`add_titles.py`](./add_titles.py), [`generators/`](./generators) | Code that generates the counterfactual images |
 
-### 2.1 Try Example Images
+## 1. Quick start
 
-Want to quickly test your model on challenging images? Use our pre-selected examples where most VLMs fail:
+### 1.1 Try example images
 
-👉 **[Download example images](./examples)**
+[`examples/`](./examples) holds a few counterfactual images per task (e.g., a 3-legged chicken, a 4-stripe Adidas logo). Upload one to any chatbot and ask it to count.
 
-### 2.2 Run with lmms-eval (For Standardized Evaluation)
+### 1.2 Load the dataset
 
-VLMBias is officially integrated with [lmms-eval](https://github.com/EvolvingLMMs-Lab/lmms-eval), a popular evaluation framework.
+The benchmark is on Hugging Face. Each split is one subset of the paper:
 
-**Step 1:** Install lmms-eval following their [documentation](https://github.com/EvolvingLMMs-Lab/lmms-eval)
+```python
+from datasets import load_dataset
 
-**Step 2:** Run the benchmark:
+main = load_dataset("anvo25/vlms-are-biased", split="main")   # 2,784 counting questions
+```
+
+| Split | Rows | Description | Paper section |
+|---|---:|---|---|
+| `main` | 2,784 | Counting questions on counterfactual images | Throughout |
+| `identification` | 1,392 | Identification questions on counterfactual images | Sec. 4.3 |
+| `withtitle` | 2,784 | Counting, with the subject's name written in the image | Sec. A.9 |
+| `original` | 458 | Identification questions on the original (unmodified) images | Sec. 4.1 |
+| `remove_background_q1q2` | 2,784 | Counting, with the image background removed | Sec. 4.4 |
+| `remove_background_q3` | 1,392 | Identification, with the image background removed | Sec. 4.4 |
+
+Each row has `image`, `ID`, `image_path`, `topic`, `sub_topic`, `prompt`, `ground_truth`, `expected_bias` (the answer for the familiar, unmodified subject), `with_title`, `type_of_question`, `pixel` and `metadata`.
+
+### 1.3 Run with lmms-eval
+
+VLMBias is integrated in [lmms-eval](https://github.com/EvolvingLMMs-Lab/lmms-eval) (the `main` split only):
 
 ```bash
 python -m lmms_eval \
@@ -64,126 +85,92 @@ python -m lmms_eval \
   --device cuda:0
 ```
 
-For more details: [lmms_eval/tasks/vlms_are_biased](https://github.com/EvolvingLMMs-Lab/lmms-eval/tree/main/lmms_eval/tasks/vlms_are_biased)
+See [lmms_eval/tasks/vlms_are_biased](https://github.com/EvolvingLMMs-Lab/lmms-eval/tree/main/lmms_eval/tasks/vlms_are_biased).
 
-**Note:** lmms-eval currently only supports the `main` subset. For other subsets, use [Section 2.3](#23-use-the-pre-built-dataset-recommended).
+## 2. Evaluate an API model
 
-### 2.3 Use the Pre-built Dataset (For Thorough Evaluation)
+```bash
+pip install -r requirements.txt
+export OPENAI_API_KEY=...        # or ANTHROPIC_API_KEY / GEMINI_API_KEY
 
-Want to evaluate your model on the full benchmark, or to have more control over the evaluation process? Load our dataset directly from Hugging Face:
+# Ask the model every question of a split (resumable: re-run the same command after an interruption)
+python evaluation/run_api.py --provider openai --model gpt-4.1 --split main
+python evaluation/run_api.py --provider gemini --model gemini-2.5-pro --limit 20   # quick check
 
-```python
-import datasets
-dataset = datasets.load_dataset('anvo25/vlms-are-biased')
+# Accuracy and bias rate per task, and their mean
+python evaluation/score.py results/gpt-4.1_main.jsonl
 ```
 
-See [Section 3](#3-dataset-details) for details on available subsets.
+The answer is the last `{...}` in the response, as the prompts request. A row is **correct** when the answer equals `ground_truth` and **bias-aligned** when it equals `expected_bias`. The mean is taken over the 7 tasks, as in the paper. `run_api.py --input-file` also runs on images you generate yourself (Section 4).
 
+## 3. Human study
 
----
+[`human_study/`](./human_study) contains the responses of the 78 participants who counted animal legs after seeing each image for 0.2–2 seconds. `python human_study/analyze.py` reproduces the human-study table of the paper. Participant data is de-identified; see the folder's README.
 
-## 3. Dataset Details
+## 4. Generate your own images
 
-### 3.1 Dataset Structure
-
-Loading the dataset returns a `DatasetDict` with multiple subsets:
-
-```python
-DatasetDict({
-    main: Dataset({...num_rows: 2784}),
-    identification: Dataset({...num_rows: 1392}),
-    withtitle: Dataset({...num_rows: 2784}),
-    original: Dataset({...num_rows: 458}),
-    remove_background_q1q2: Dataset({...num_rows: 2784}),
-    remove_background_q3: Dataset({...num_rows: 1392}),
-})
-```
-
-### 3.2 Subset Descriptions
-
-| Subset | Description | Paper Section |
-|--------|-------------|---------------|
-| `main` | Counting dataset of counterfactual images | Throughout paper |
-| `identification` | Identification dataset of counterfactual images | Section 4.3 |
-| `withtitle` | Counting dataset with in-image title injection | Section A.9 |
-| `original` | Identification dataset of original (unmodified) images | Section 4.1 |
-| `remove_background_q1q2` | Counting dataset with background removed | Section 4.4 |
-| `remove_background_q3` | Identification dataset with background removed | Section 4.4 |
-
-### 3.3 Data Fields
-
-Each sample contains: `image`, `ID`, `image_path`, `topic`, `sub_topic`, `prompt`, `ground_truth`, `expected_bias`, `with_title`, `type_of_question`, `pixel`, `metadata`
-
----
-
-## 4. Generate Your Own Dataset
-
-**Goal:** Reproduce our dataset or create custom variations. Skip this section if you only need the pre-built dataset.
+Use the Hugging Face dataset to compare with the paper. The generators let you build new variations. Some images they make differ from the published ones (see Section 4.4).
 
 ### 4.1 Installation
 
 ```bash
 git clone https://github.com/anvo25/vlms-are-biased.git
 cd vlms-are-biased
-pip install -r requirements.txt
+pip install -r requirements.txt   # cairosvg also needs the system Cairo library
 ```
 
-### 4.2 Generate All Datasets
+### 4.2 Tasks drawn with code
 
 ```bash
-# Step 1: Generate images without titles
-python main.py --all
-
-# Step 2: Add in-image titles
-python add_titles.py --topic all
+python main.py --all                     # every task below
+python main.py --chess_board --go_board  # or pick tasks
+python add_titles.py --topic all         # optional: versions with the subject's name in the image
 ```
 
-### 4.3 Generate Specific Tasks
+| Flag | Task | Generator |
+|---|---|---|
+| `--chess_pieces` | Chess starting position with one piece removed or replaced | [chess_pieces_generator.py](generators/chess_pieces_generator.py) |
+| `--xiangqi_pieces` | Xiangqi starting position with one piece removed or replaced | [xiangqi_pieces_generator.py](generators/xiangqi_pieces_generator.py) |
+| `--chess_board`, `--go_board`, `--xiangqi_board`, `--sudoku_board` | Boards with one row or column added or removed | [chess](generators/chess_board_generator.py), [go](generators/go_board_generator.py), [xiangqi](generators/xiangqi_board_generator.py), [sudoku](generators/sudoku_board_generator.py) |
+| `--patterned_grids` | Dice and tally grids with one cell changed | [patterned_grid_generator.py](generators/patterned_grid_generator.py) |
+| `--optical_illusions` | Ebbinghaus, Müller-Lyer, Ponzo, Vertical-Horizontal, Zöllner, Poggendorff | [optical_illusion_generator.py](generators/optical_illusion_generator.py) |
 
-To run the code to generate the **counterfactual** images for a specific task, go to the following embedded links:
-- **Chess Pieces**: [Chess pieces](generators/chess_pieces_generator.py), [Xiangqi pieces](generators/xiangqi_board_generator.py) (modified starting positions)
-- **Game Boards**: [Chess board](generators/chess_board_generator.py), [Go board](generators/go_board_generator.py), [Xiangqi board](generators/xiangqi_board_generator.py), [Sudoku board](generators/sudoku_board_generator.py) (dimension variations)  
-- **[Optical Illusions](generators/optical_illusion_generator.py)**: Ebbinghaus, Müller-Lyer, Ponzo, Vertical-Horizontal, Zöllner, Poggendorff  
-- **[Patterned Grids](generators/patterned_grid_generator.py)**: Dice patterns, Tally mark patterns (anomalous cells)  
-- **[Animals](generators/animals_generator.py)**: Mammals (4 legs → 5 legs) and birds (2 legs → 3 legs)  
-- **[Logos](generators/logos_generator.py#L10)**: Consisting of 2 logo types: shoes and cars.
-  - **Shoe Logos**:  
-    - Nike (1 swoosh → 2 swooshes)
-    - Adidas (3 stripes → 4 stripes)
-  - **Car Logos**:  
-    - Maserati (3 prongs → 5 prongs)
-    - Mercedes-Benz (3-pointed star → 4-pointed star)
-    - Audi (4 overlapping circles → 5 overlapping circles)
-- **[Flags](generators/flags_generator.py)**: Star-typed flags (+1 and −1 star) and stripes (+1 and −1 stripe)
+Every image is made at 384, 768 and 1152 px: one side of the image is exactly that size (the height for most tasks, the width for xiangqi), and most images are square. Output goes to `vlms-are-biased-notitle/<task>/`, with the images and a `*_metadata.json` file in the same format as the Hugging Face rows.
 
-*All images are generated at 384px, 768px, and 1152px resolutions.*
+### 4.3 Tasks made with image-editing models
 
-### 4.4 Adding Titles to Generated Images
+Animals, logos and flags are made by asking an image or language model to edit a real subject, then reviewed by hand. These scripts need API keys and are run one by one:
 
-After generating images, add in-image titles:
+| Command | Task | Needs |
+|---|---|---|
+| `python -m generators.animals_generator` | Animals with one leg added (the paper's set) or removed | `GEMINI_API_KEY` |
+| `python -m generators.logos_generator --type shoes` | Nike (2 swooshes) and Adidas (4 stripes) shoes | `GEMINI_API_KEY`; base shoe photos in [`generators/shoes_dir`](generators/shoes_dir) |
+| `python -m generators.logos_generator --type cars` | Cars with a modified Maserati (5 prongs), Mercedes-Benz (4-point star) or Audi (5 rings) logo | `GEMINI_API_KEY`; the modified logo is pasted on by hand (the script prints the steps) |
+| `python -m generators.flags_generator` | Flags with one stripe added or removed | `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` |
 
-```bash
-python add_titles.py --topic chess_pieces  # or: all, logos, flags, etc.
-```
+The animal and flag lists in these scripts are short by default; add entries to `ANIMALS` / `FLAG_DATA` to generate more.
 
----
+### 4.4 Differences from the published dataset
 
-## 5. Project Structure
+The generators were cleaned up after the dataset was released, so regenerated images are not identical to the Hugging Face ones:
+
+- **Optical illusions.** The features being asked about are red and the questions name them (e.g., *"Are the two red lines equal in length?"*). Each illusion is drawn once at 1152 px and downscaled, so lines have the same relative thickness at every resolution. Vertical-Horizontal is an inverted T.
+- **Game boards.** Adding or removing the *first* row or column now looks different from the *last* one: chess squares and the xiangqi palace stay on their original positions. In the published data these pairs are identical images.
+- **IDs and sampling.** Piece and grid edits are sampled at random, and IDs follow each generator's own naming, so they do not match the published IDs.
+
+## 5. Project structure
 
 ```
 vlms-are-biased/
-├── main.py                          # Generate "notitle" datasets
-├── add_titles.py                    # Add "in_image_title" versions
-├── generators/                      # Individual dataset generators
-│   ├── chess_pieces_generator.py
-│   ├── optical_illusion_generator.py
-│   └── ...
-├── examples/                        # Example images for quick testing
-├── vlms-are-biased-notitle/         # Output: images without titles
-└── vlms-are-biased-in_image_title/  # Output: images with titles
+├── main.py                  # generate the "notitle" images (Section 4.2)
+├── add_titles.py            # add the subject's name to generated images
+├── utils.py, grid_utils.py  # shared drawing and file helpers
+├── generators/              # one generator per task
+├── evaluation/              # run_api.py (query a model), score.py (accuracy and bias rate)
+├── human_study/             # human study data and analysis
+├── examples/                # sample images per task
+└── figures/                 # README figure
 ```
-
----
 
 ## 6. Citation
 
@@ -196,5 +183,3 @@ vlms-are-biased/
       url={https://arxiv.org/abs/2505.23941},
 }
 ```
-
-

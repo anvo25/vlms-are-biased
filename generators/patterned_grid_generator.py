@@ -722,8 +722,8 @@ def _generate_single_patterned_grid_action_images_and_meta(
         if standard_count_at_anomalous_cell > 0: modified_count_at_anomalous_cell -=1
     elif operation_performed == 'add': # Tally only
         modified_count_at_anomalous_cell += 1
-    elif operation_performed == 'replace': # Dice only, count of shapes in cell doesn't change
-        modified_count_at_anomalous_cell = standard_count_at_anomalous_cell 
+    elif operation_performed == 'replace': # Dice only: one circle becomes a square, so one circle fewer
+        modified_count_at_anomalous_cell -= 1
     modified_count_at_anomalous_cell = max(0, modified_count_at_anomalous_cell)
 
     # Prompts (Q1, Q2 ask about count in anomalous cell; Q3 asks if cell matches standard count)

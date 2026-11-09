@@ -61,7 +61,16 @@ class XiangqiBoardGrid:
         self.river_row_idx = max(0, min(self.river_row_idx, self.rows - 2))
         
         self.pieces = {} # Stores {(file_idx, rank_idx): 'piece_symbol'}
+        # Columns added (+) or removed (-) on the left. The palace stays on its original files,
+        # so changing the first column looks different from changing the last.
+        self.col_offset = 0
         self._setup_palace_pieces()
+
+    @property
+    def palace_center_file(self):
+        """File of the generals: file 4 of the standard board, shifted by left-side edits."""
+        center = (STANDARD_BOARD_COLS - 1) // 2 + self.col_offset
+        return center if 0 <= center < self.cols else (self.cols - 1) // 2
 
     def _to_square_tuple(self, file_idx, rank_idx):
         if 0 <= file_idx < self.cols and 0 <= rank_idx < self.rows:
@@ -77,20 +86,8 @@ class XiangqiBoardGrid:
         self.pieces.clear()
         
         # Standard positions require at least 9 columns and 10 rows.
-        if self.cols >= 9 and self.rows >= 10:
-            # Black pieces (rank 0)
-            black_rank = 0
-            self.set_piece_at_coords(4, black_rank, 'k') # Black General
-            self.set_piece_at_coords(3, black_rank, 'a') # Black Advisor
-            self.set_piece_at_coords(5, black_rank, 'a') # Black Advisor
-            
-            # Red pieces (rank 9 on a 10-row board)
-            red_rank = self.rows - 1 # Should be 9 for standard
-            self.set_piece_at_coords(4, red_rank, 'K') # Red General
-            self.set_piece_at_coords(3, red_rank, 'A') # Red Advisor
-            self.set_piece_at_coords(5, red_rank, 'A') # Red Advisor
-        elif self.cols >= 5 and self.rows >= 1: # Fallback for smaller boards (simplified placement)
-            center_file_idx = (self.cols - 1) // 2
+        if self.cols >= 5 and self.rows >= 1:
+            center_file_idx = self.palace_center_file
             self.set_piece_at_coords(center_file_idx, 0, 'k')
             self.set_piece_at_coords(center_file_idx, self.rows - 1, 'K')
             if center_file_idx > 0: # Check if space for advisors
@@ -176,6 +173,7 @@ class XiangqiBoardGrid:
         insert_idx = max(0, min(insert_idx, self.cols))
         self._adjust_pieces_for_col_change(insert_idx, is_add_op=True)
         self.cols += 1
+        if insert_idx == 0: self.col_offset += 1
         self._setup_palace_pieces()
         return {"action": "add_column", "dimension": "col", "position_added": position, "insert_index": insert_idx}
 
@@ -185,6 +183,7 @@ class XiangqiBoardGrid:
         if not (0 <= remove_idx < self.cols): return None
         self._adjust_pieces_for_col_change(remove_idx, is_add_op=False)
         self.cols -= 1
+        if remove_idx == 0: self.col_offset -= 1
         self._setup_palace_pieces()
         return {"action": "remove_column", "dimension": "col", "position_removed": position, "remove_index": remove_idx}
 
@@ -246,7 +245,7 @@ def draw_xiangqi_board_svg(board_obj, render_size=800, cjk_font_for_svg=None):
             dwg.add(dwg.line((x, grid_origin_y), (x, grid_origin_y + board_render_height), **line_attrs))
             
     if board_obj.cols >= 3 and board_obj.rows >=3:
-        palace_center_file_idx = (board_obj.cols - 1) // 2
+        palace_center_file_idx = board_obj.palace_center_file
         palace_min_f_idx = palace_center_file_idx - 1
         palace_max_f_idx = palace_center_file_idx + 1
         
