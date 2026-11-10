@@ -138,6 +138,7 @@ so a `nobg` sample with the same number can show a different modification; `deta
 |---|---|---|
 | [lmms-eval](https://github.com/EvolvingLMMs-Lab/lmms-eval/tree/main/lmms_eval/tasks/vlms_are_biased) | `vlms_are_biased` | This repository, default config, `main` split: **v2** |
 | [VLMEvalKit](https://github.com/open-compass/VLMEvalKit) | `vlms_are_biased_main` | Its own copy of the v1 `main` split |
+| [EvalScope](https://evalscope.readthedocs.io/en/latest/benchmarks/vlms_are_biased.html) | `vlms_are_biased` | Its own copy on ModelScope (`evalscope/vlms-are-biased`), from v1 |
 | [Our scripts](https://github.com/anvo25/vlms-are-biased#2-evaluate-an-api-model) | `evaluation/run_api.py` | Any split, v2 or v1 (`--config v1`) |
 
 **lmms-eval**
@@ -163,6 +164,16 @@ python run.py --data vlms_are_biased_main --model Qwen2.5-VL-7B-Instruct
 
 VLMEvalKit evaluates a copy of the v1 `main` split that it hosts itself, so its results match the
 ICLR paper's data and not v2.
+
+**EvalScope**
+
+```bash
+evalscope eval --model YOUR_MODEL --api-url OPENAI_COMPATIBLE_URL --api-key EMPTY \
+  --datasets vlms_are_biased
+```
+
+EvalScope evaluates all 6 splits by default (`subset_list: ['main']` in its `TaskConfig` selects
+`main`). It loads its own copy of the data on ModelScope, made from v1.
 
 **API models (OpenAI, Anthropic, Gemini)**
 
