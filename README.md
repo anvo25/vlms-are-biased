@@ -150,7 +150,7 @@ The answer is the last `{...}` in the response, as the prompts request. A row is
 
 ## 3. Human study
 
-[`human_study/`](./human_study) contains the responses of the 78 participants who counted animal legs after seeing each image for 0.2–2 seconds. `python human_study/analyze.py` reproduces the human-study table of the paper. Participant data is de-identified; see the folder's README.
+[`human_study/`](./human_study) contains the responses of the 78 participants who counted animal legs after seeing each image for 0.2–2 seconds. `python human_study/analyze.py` reproduces the human-study table of the paper. Participant data is de-identified.
 
 ## 4. Generate your own images
 

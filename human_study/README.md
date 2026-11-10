@@ -41,10 +41,11 @@ python human_study/analyze.py
 |---|---|
 | `participant_id`, `viewing_time_s` | As above |
 | `trial` | Question position for this participant (1–10) |
-| `image_id` | Image name in the VLMBias Animals set (prompt Q1, no title, resolution suffix) |
+| `ID` | Row ID of the image in the [Hugging Face dataset](https://huggingface.co/datasets/anvo25/vlms-are-biased) (v2): a `main` row for counterfactual images, an `original` row for original images |
+| `legacy_ID` | The same row's ID in dataset v1 |
 | `animal_id`, `animal` | Animal index (1–91) and name |
 | `image_type` | `counterfactual` (one leg added) or `original` |
-| `resolution_px` | Image resolution shown (384, 768 or 1152) |
+| `resolution_px` | Image resolution shown (384, 768 or 1152); original images are the dataset photo resized to it |
 | `question` | Question text as shown. The first 30 participants saw "How many legs *do* this animal have?" (a typo, fixed during the study) |
 | `correct_answer` | Leg count in the image |
 | `bias_answer` | Leg count of the unmodified animal (counterfactual images only) |
@@ -52,9 +53,3 @@ python human_study/analyze.py
 | `is_correct` | 1 if `user_answer` equals `correct_answer` |
 | `is_bias_aligned` | 1 if `user_answer` equals `bias_answer` (counterfactual images only) |
 | `trial_time_ms` | Time from question onset to answer, in ms (reading + image + response) |
-
-## Exclusions and privacy
-
-The raw export had 82 submissions. We removed 3 internal test submissions and 1 submission whose per-question responses were not recorded, leaving the 78 participants reported in the paper.
-
-Participation was anonymous. Before release we removed the optional email field, the original submission IDs and all wall-clock timestamps, assigned participant IDs in random order, and kept demographics only as aggregate counts, so that no row can be linked to a person.
