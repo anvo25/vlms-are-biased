@@ -24,6 +24,12 @@
 
 </div>
 
+> **News (2026-11-10): the Hugging Face dataset is now v2.** The optical-illusion features that the questions
+> ask about are drawn in red and the questions name them; all other images and every answer are
+> unchanged, and rows have new, readable IDs. The data of the ICLR paper is still available as the
+> `v1` config. See [Section 1.2](#12-load-the-dataset) and the
+> [dataset card](https://huggingface.co/datasets/anvo25/vlms-are-biased#what-changed-in-v2).
+
 ---
 
 ## Abstract
@@ -53,28 +59,47 @@
 
 ### 1.2 Load the dataset
 
-The benchmark is on Hugging Face. Each split is one subset of the paper:
+The benchmark is on Hugging Face. The default version is **v2**; **v1** is the data of the ICLR paper:
 
 ```python
 from datasets import load_dataset
 
-main = load_dataset("anvo25/vlms-are-biased", split="main")   # 2,784 counting questions
+main = load_dataset("anvo25/vlms-are-biased", split="main")             # v2: 2,784 counting questions
+main_v1 = load_dataset("anvo25/vlms-are-biased", "v1", split="main")    # v1: the ICLR paper's data
+# the repository exactly as published: load_dataset(..., revision="v1.0")
 ```
+
+v1 and v2 have the same rows and answers. In v2 the optical-illusion features asked about are red and
+the questions name them (e.g., *"Are the two red lines equal in length?"*), rows have new IDs (the v1
+ID is kept in `legacy_ID`), and a few v1 problems are fixed, including a truncated image in
+`identification`. The [dataset card](https://huggingface.co/datasets/anvo25/vlms-are-biased#what-changed-in-v2)
+lists every change.
+
+Each split is one subset of the paper:
 
 | Split | Rows | Description | Paper section |
 |---|---:|---|---|
 | `main` | 2,784 | Counting questions on counterfactual images | Throughout |
 | `identification` | 1,392 | Identification questions on counterfactual images | Sec. 4.3 |
 | `withtitle` | 2,784 | Counting, with the subject's name written in the image | Sec. A.9 |
-| `original` | 458 | Identification questions on the original (unmodified) images | Sec. 4.1 |
+| `original` | 458 | Questions on the original (unmodified) images | Sec. 4.1 |
 | `remove_background_q1q2` | 2,784 | Counting, with the image background removed | Sec. 4.4 |
 | `remove_background_q3` | 1,392 | Identification, with the image background removed | Sec. 4.4 |
 
-Each row has `image`, `ID`, `image_path`, `topic`, `sub_topic`, `prompt`, `ground_truth`, `expected_bias` (the answer for the familiar, unmodified subject), `with_title`, `type_of_question`, `pixel` and `metadata`.
+Each v2 row has `image`, `ID`, `legacy_ID`, `topic`, `sub_topic`, `prompt`, `ground_truth`,
+`expected_bias` (the biased answer: the answer for the unmodified subject), `with_title`,
+`type_of_question`, `pixel` and `metadata`. IDs read like `illusion-ponzo-013-diff0p15-notitle-q1-384`
+(task, subtask, sample, what the sample is, condition, question, image size).
 
-### 1.3 Run with lmms-eval
+### 1.3 Evaluation frameworks
 
-VLMBias is integrated in [lmms-eval](https://github.com/EvolvingLMMs-Lab/lmms-eval) (the `main` split only):
+| Framework | Name | Data it uses |
+|---|---|---|
+| [lmms-eval](https://github.com/EvolvingLMMs-Lab/lmms-eval/tree/main/lmms_eval/tasks/vlms_are_biased) | `vlms_are_biased` | The Hugging Face dataset, `main` split, default version (**v2**) |
+| [VLMEvalKit](https://github.com/open-compass/VLMEvalKit) | `vlms_are_biased_main` | VLMEvalKit's own copy of the v1 `main` split |
+| This repository | [`evaluation/run_api.py`](evaluation/run_api.py) | Any split of v2 or v1 (Section 2) |
+
+**lmms-eval**
 
 ```bash
 python -m lmms_eval \
@@ -85,7 +110,16 @@ python -m lmms_eval \
   --device cuda:0
 ```
 
-See [lmms_eval/tasks/vlms_are_biased](https://github.com/EvolvingLMMs-Lab/lmms-eval/tree/main/lmms_eval/tasks/vlms_are_biased).
+To run lmms-eval on v1, copy `lmms_eval/tasks/vlms_are_biased/vlms_are_biased.yaml`, give the copy a
+new `task:` name and add `dataset_name: v1`.
+
+**VLMEvalKit**
+
+```bash
+python run.py --data vlms_are_biased_main --model Qwen2.5-VL-7B-Instruct
+```
+
+VLMEvalKit hosts its own copy of the data, so its results are on v1.
 
 ## 2. Evaluate an API model
 
@@ -95,6 +129,7 @@ export OPENAI_API_KEY=...        # or ANTHROPIC_API_KEY / GEMINI_API_KEY
 
 # Ask the model every question of a split (resumable: re-run the same command after an interruption)
 python evaluation/run_api.py --provider openai --model gpt-4.1 --split main
+python evaluation/run_api.py --provider openai --model gpt-4.1 --split main --config v1   # the paper's data
 python evaluation/run_api.py --provider gemini --model gemini-2.5-pro --limit 20   # quick check
 
 # Accuracy and bias rate per task, and their mean
@@ -154,8 +189,8 @@ The animal and flag lists in these scripts are short by default; add entries to 
 
 The generators were cleaned up after the dataset was released, so regenerated images are not identical to the Hugging Face ones:
 
-- **Optical illusions.** The features being asked about are red and the questions name them (e.g., *"Are the two red lines equal in length?"*). Each illusion is drawn once at 1152 px and downscaled, so lines have the same relative thickness at every resolution. Vertical-Horizontal is an inverted T.
-- **Game boards.** Adding or removing the *first* row or column now looks different from the *last* one: chess squares and the xiangqi palace stay on their original positions. In the published data these pairs are identical images.
+- **Optical illusions.** As in dataset v2, the features being asked about are red and the questions name them (e.g., *"Are the two red lines equal in length?"*). The generator also draws each illusion once at 1152 px and downscales it, so lines have the same relative thickness at every resolution, whereas the dataset keeps the published line widths. Vertical-Horizontal is an inverted T.
+- **Game boards.** Adding or removing the *first* row or column now looks different from the *last* one: chess squares and the xiangqi palace stay on their original positions. In the published data these pairs are identical images for chess (rows and columns) and for xiangqi columns.
 - **IDs and sampling.** Piece and grid edits are sampled at random, and IDs follow each generator's own naming, so they do not match the published IDs.
 
 ## 5. Project structure
@@ -167,6 +202,7 @@ vlms-are-biased/
 ├── utils.py, grid_utils.py  # shared drawing and file helpers
 ├── generators/              # one generator per task
 ├── evaluation/              # run_api.py (query a model), score.py (accuracy and bias rate)
+├── hf_dataset/              # builds Hugging Face dataset v2 from v1 and checks it
 ├── human_study/             # human study data and analysis
 ├── examples/                # sample images per task
 └── figures/                 # README figure

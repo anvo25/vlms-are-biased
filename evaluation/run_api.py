@@ -13,13 +13,16 @@ Examples
     python evaluation/run_api.py --provider gemini --model gemini-2.5-pro
     python evaluation/run_api.py --provider anthropic --model claude-sonnet-4-20250514
 
+    # The data of the ICLR paper (v1: optical illusions in black), instead of the default v2
+    python evaluation/run_api.py --provider openai --model gpt-4.1 --config v1
+
     # Images you generated yourself
     python evaluation/run_api.py --provider openai --model gpt-4.1 \
         --input-file vlms-are-biased-notitle/animals/animals_notitle_metadata.json
 
 Then score the answers with `python evaluation/score.py results/<file>.jsonl`.
 
-Output: one JSON object per line in results/<model>_<split or input name>.jsonl.
+Output: one JSON object per line in results/<model>_<split or input name>[_v1].jsonl.
 Runs resume: rows already answered are skipped, so re-running the same command is safe.
 API keys are read from --api-key-path, or else from OPENAI_API_KEY, ANTHROPIC_API_KEY or
 GEMINI_API_KEY.
@@ -45,8 +48,8 @@ KEY_ENV = {"openai": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY", "gemini
 
 def load_rows(args) -> list[dict]:
     """Rows as dicts with the PNG bytes under "image_bytes"."""
-    keep = ("ID", "image_path", "topic", "sub_topic", "prompt", "ground_truth", "expected_bias",
-            "with_title", "type_of_question", "pixel")
+    keep = ("ID", "legacy_ID", "image_path", "topic", "sub_topic", "prompt", "ground_truth",
+            "expected_bias", "with_title", "type_of_question", "pixel")
     if args.input_file:
         meta = json.loads(Path(args.input_file).read_text(encoding="utf-8"))
         root = Path(args.image_root)
@@ -54,7 +57,9 @@ def load_rows(args) -> list[dict]:
                 for m in meta]
 
     from datasets import Image, load_dataset
-    ds = load_dataset(DATASET, split=args.split).cast_column("image", Image(decode=False))
+    config = None if args.config in (None, "v2") else args.config  # v2 is the "default" config
+    ds = load_dataset(DATASET, config, split=args.split, revision=args.revision)
+    ds = ds.cast_column("image", Image(decode=False))
     return [{**{k: r.get(k) for k in keep}, "image_bytes": r["image"]["bytes"]} for r in ds]
 
 
@@ -134,6 +139,11 @@ def main() -> None:
     p.add_argument("--split", default="main",
                    help="HF dataset split: main, identification, withtitle, original, "
                         "remove_background_q1q2, remove_background_q3 (default: main)")
+    p.add_argument("--config", choices=["v1", "v2"], default=None,
+                   help="HF dataset version: v2 (default; optical illusions with red targets) or v1 "
+                        "(the data of the ICLR paper)")
+    p.add_argument("--revision", default=None,
+                   help="HF dataset git revision, e.g. v1.0 for the repository exactly as published")
     p.add_argument("--input-file", help="Metadata JSON from main.py/add_titles.py instead of the HF dataset")
     p.add_argument("--image-root", default=".", help="Directory that image_path in --input-file is relative to")
     p.add_argument("--output", help="Output .jsonl (default: results/<model>_<split>.jsonl)")
@@ -152,6 +162,8 @@ def main() -> None:
 
     rows = load_rows(args)[: args.limit]
     name = Path(args.input_file).stem if args.input_file else args.split
+    if args.config == "v1" or args.revision == "v1.0":
+        name += "_v1"
     out = Path(args.output or f"results/{args.model.replace('/', '_')}_{name}.jsonl")
     out.parent.mkdir(parents=True, exist_ok=True)
     done = load_done(out)

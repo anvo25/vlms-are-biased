@@ -148,13 +148,15 @@ if HAS_PYLLUSION:
 def draw_vertical_horizontal(size_min, difference, px):
     """Inverted-T Vertical-Horizontal illusion: a red vertical line standing on the middle of a
     red horizontal line. Lengths follow Pyllusion's convention (1 = half the image width):
-    the shorter line is `size_min` long and the other is (1 + |difference|) times longer;
-    a positive difference makes the horizontal line longer, a negative one the vertical line."""
+    the shorter line is `size_min` long and the other is (1 + |difference|) times longer.
+    A positive difference makes the vertical line longer, as in the published dataset: the
+    illusion also makes the vertical look longer, so the real difference is unambiguous.
+    A negative difference makes the horizontal line longer."""
     scale = 2  # draw at 2x and downscale, for antialiasing
     canvas = px * scale
     unit = canvas / 2
-    horizontal = size_min * (1 + max(difference, 0)) * unit
-    vertical = size_min * (1 + max(-difference, 0)) * unit
+    horizontal = size_min * (1 + max(-difference, 0)) * unit
+    vertical = size_min * (1 + max(difference, 0)) * unit
     width = max(1, round(VH_LINE_WIDTH * canvas))
     img = Image.new("RGB", (canvas, canvas), "white")
     draw = ImageDraw.Draw(img)
@@ -295,12 +297,11 @@ def _generate_illusion_images_and_metadata(
                     # ID for metadata entry: <IllusionType>_<sample_id>_<param_str>_notitle_px<res>_<Qkey>
                     meta_id_str = f"{base_filename_id_part}_{param_str_for_filename}_notitle_px{res_px}_{q_key}"
                     
-                    # Q3 is an identification question ("Is this Ebbinghaus illusion?")
-                    # GT for Q3 is always "Yes" as we are generating that illusion.
-                    # Bias for Q3 would be "No" if model fails to identify it.
-                    current_gt = ground_truth_answer if q_key != "Q3" else "Yes"
-                    current_bias_exp = expected_bias_answer_q1q2 if q_key != "Q3" else "No"
-
+                    # Q3 ("Is this an example of the X illusion?") has the same labels as Q1/Q2,
+                    # as in the published dataset: an unmodified illusion (difference 0) is the
+                    # illusion (Yes); a modified one is not (No), and the bias is to say Yes.
+                    current_gt = ground_truth_answer
+                    current_bias_exp = expected_bias_answer_q1q2
 
                     all_metadata_for_this_illusion.append({
                         "ID": meta_id_str,

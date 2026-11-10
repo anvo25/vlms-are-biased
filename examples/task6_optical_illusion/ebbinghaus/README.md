@@ -3,12 +3,12 @@
 ## Prompts
 
 
-- **Q1**: Are the two inner circles equal in size? Answer in curly brackets, e.g., {Yes} or {No}.
+- **Q1**: Are the two red circles equal in size? Answer in curly brackets, e.g., {Yes} or {No}.
 - **Ground truth**: No
 
 ---
 
-- **Q2**: Do the two inner circles have the same size? Answer in curly brackets, e.g., {Yes} or {No}.
+- **Q2**: Do the two red circles have the same size? Answer in curly brackets, e.g., {Yes} or {No}.
 - **Ground truth**: No
 
 ---
