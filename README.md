@@ -27,7 +27,7 @@
 > **News (2026-11-10): the Hugging Face dataset is now v2.** The optical-illusion features that the questions
 > ask about are drawn in red and the questions name them; all other images and every answer are
 > unchanged, and rows have new, readable IDs. The data of the ICLR paper is still available as the
-> `v1` config. See [Section 1.2](#12-load-the-dataset) and the
+> `v1-legacy` config. See [Section 1.2](#12-load-the-dataset) and the
 > [dataset card](https://huggingface.co/datasets/anvo25/vlms-are-biased#what-changed-in-v2).
 
 ---
@@ -65,7 +65,7 @@ The benchmark is on Hugging Face. The default version is **v2**; **v1** is the d
 from datasets import load_dataset
 
 main = load_dataset("anvo25/vlms-are-biased", split="main")             # v2: 2,784 counting questions
-main_v1 = load_dataset("anvo25/vlms-are-biased", "v1", split="main")    # v1: the ICLR paper's data
+main_v1 = load_dataset("anvo25/vlms-are-biased", "v1-legacy", split="main")    # v1: the ICLR paper's data
 # the repository exactly as published: load_dataset(..., revision="v1.0")
 ```
 
@@ -112,7 +112,7 @@ python -m lmms_eval \
 ```
 
 To run lmms-eval on v1, copy `lmms_eval/tasks/vlms_are_biased/vlms_are_biased.yaml`, give the copy a
-new `task:` name and add `dataset_name: v1`.
+new `task:` name and add `dataset_name: v1-legacy`.
 
 **VLMEvalKit**
 
@@ -139,7 +139,7 @@ export OPENAI_API_KEY=...        # or ANTHROPIC_API_KEY / GEMINI_API_KEY
 
 # Ask the model every question of a split (resumable: re-run the same command after an interruption)
 python evaluation/run_api.py --provider openai --model gpt-4.1 --split main
-python evaluation/run_api.py --provider openai --model gpt-4.1 --split main --config v1   # the paper's data
+python evaluation/run_api.py --provider openai --model gpt-4.1 --split main --config v1-legacy   # the paper's data
 python evaluation/run_api.py --provider gemini --model gemini-2.5-pro --limit 20   # quick check
 
 # Accuracy and bias rate per task, and their mean

@@ -14,7 +14,7 @@ Examples
     python evaluation/run_api.py --provider anthropic --model claude-sonnet-4-20250514
 
     # The data of the ICLR paper (v1: optical illusions in black), instead of the default v2
-    python evaluation/run_api.py --provider openai --model gpt-4.1 --config v1
+    python evaluation/run_api.py --provider openai --model gpt-4.1 --config v1-legacy
 
     # Images you generated yourself
     python evaluation/run_api.py --provider openai --model gpt-4.1 \
@@ -139,7 +139,7 @@ def main() -> None:
     p.add_argument("--split", default="main",
                    help="HF dataset split: main, identification, withtitle, original, "
                         "remove_background_q1q2, remove_background_q3 (default: main)")
-    p.add_argument("--config", choices=["v1", "v2"], default=None,
+    p.add_argument("--config", choices=["v1-legacy", "v2"], default=None,
                    help="HF dataset version: v2 (default; optical illusions with red targets) or v1 "
                         "(the data of the ICLR paper)")
     p.add_argument("--revision", default=None,
@@ -162,7 +162,7 @@ def main() -> None:
 
     rows = load_rows(args)[: args.limit]
     name = Path(args.input_file).stem if args.input_file else args.split
-    if args.config == "v1" or args.revision == "v1.0":
+    if args.config == "v1-legacy" or args.revision == "v1.0":
         name += "_v1"
     out = Path(args.output or f"results/{args.model.replace('/', '_')}_{name}.jsonl")
     out.parent.mkdir(parents=True, exist_ok=True)

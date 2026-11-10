@@ -23,7 +23,7 @@ configs:
     path: data/v2/remove_background_q1q2-*
   - split: remove_background_q3
     path: data/v2/remove_background_q3-*
-- config_name: v1
+- config_name: v1-legacy
   data_files:
   - split: main
     path: data/main-*
@@ -65,7 +65,7 @@ configs:
 > **News (v2, 2026-11-10).** The default version of this dataset is now **v2** (the `default` config). In v2 the optical-illusion
 > features that the questions ask about are drawn in red and the questions name them; the other
 > images and every answer are unchanged. Rows also have new, readable IDs. The data of the ICLR paper
-> is still here: load the `v1` config, or the repository exactly as published with `revision="v1.0"`.
+> is still here: load the `v1-legacy` config, or the repository exactly as published with `revision="v1.0"`.
 > See [What changed in v2](#what-changed-in-v2).
 
 **TL;DR:** State-of-the-art vision language models (VLMs) count perfectly on original images but
@@ -85,7 +85,7 @@ from datasets import load_dataset
 main = load_dataset("anvo25/vlms-are-biased", split="main")
 
 # v1: the data of the ICLR paper
-main_v1 = load_dataset("anvo25/vlms-are-biased", "v1", split="main")
+main_v1 = load_dataset("anvo25/vlms-are-biased", "v1-legacy", split="main")
 
 # the repository exactly as it was published (v1 files and dataset card)
 main_v1 = load_dataset("anvo25/vlms-are-biased", split="main", revision="v1.0")
@@ -139,7 +139,7 @@ so a `nobg` sample with the same number can show a different modification; `deta
 | [lmms-eval](https://github.com/EvolvingLMMs-Lab/lmms-eval/tree/main/lmms_eval/tasks/vlms_are_biased) | `vlms_are_biased` | This repository, default config, `main` split: **v2** |
 | [VLMEvalKit](https://github.com/open-compass/VLMEvalKit) | `vlms_are_biased_main` | Its own copy of the v1 `main` split |
 | [EvalScope](https://evalscope.readthedocs.io/en/latest/benchmarks/vlms_are_biased.html) | `vlms_are_biased` | Its own copy on ModelScope (`evalscope/vlms-are-biased`), from v1 |
-| [Our scripts](https://github.com/anvo25/vlms-are-biased#2-evaluate-an-api-model) | `evaluation/run_api.py` | Any split, v2 or v1 (`--config v1`) |
+| [Our scripts](https://github.com/anvo25/vlms-are-biased#2-evaluate-an-api-model) | `evaluation/run_api.py` | Any split, v2 or v1 (`--config v1-legacy`) |
 
 **lmms-eval**
 
@@ -154,7 +154,7 @@ python -m lmms_eval \
 
 lmms-eval loads this repository's default config, so it runs on v2. To reproduce numbers computed on
 v1, copy `lmms_eval/tasks/vlms_are_biased/vlms_are_biased.yaml`, change `task:` to a new name, and add
-`dataset_name: v1`.
+`dataset_name: v1-legacy`.
 
 **VLMEvalKit**
 
@@ -181,7 +181,7 @@ EvalScope evaluates all 6 splits by default (`subset_list: ['main']` in its `Tas
 git clone https://github.com/anvo25/vlms-are-biased && cd vlms-are-biased
 pip install -r requirements.txt
 python evaluation/run_api.py --provider openai --model gpt-4.1 --split main            # v2
-python evaluation/run_api.py --provider openai --model gpt-4.1 --split main --config v1
+python evaluation/run_api.py --provider openai --model gpt-4.1 --split main --config v1-legacy
 python evaluation/score.py results/gpt-4.1_main.jsonl
 ```
 
